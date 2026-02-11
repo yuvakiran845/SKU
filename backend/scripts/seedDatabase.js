@@ -135,7 +135,7 @@ const seedDatabase = async () => {
             });
         }
 
-        await User.insertMany(students);
+        await User.create(students);
         console.log(`✅ Students created: ${students.length}\n`);
 
         // Create Timetable
