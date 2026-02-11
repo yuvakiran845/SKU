@@ -1,0 +1,281 @@
+/* ============================================
+   CLEAN & SIMPLE LOGIN PAGE
+   Modern, Professional, No Distractions
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==================== PAGE LAYOUT ==================== */
+.login-page-clean {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #F8FAFC 0%, #E0F2FE 50%, #F0FDF4 100%);
+    padding: 20px;
+}
+
+.login-container-clean {
+    width: 100%;
+    max-width: 480px;
+}
+
+.login-card-clean {
+    background: white;
+    border-radius: 16px;
+    padding: 48px 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* ==================== BACK BUTTON ==================== */
+.back-btn-clean {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 200ms;
+    margin-bottom: 32px;
+}
+
+.back-btn-clean:hover {
+    background: #F8FAFC;
+    border-color: #0EA5E9;
+    color: #0EA5E9;
+}
+
+/* ==================== HEADER ==================== */
+.login-header-clean {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.login-logo-icon {
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 12px rgba(14, 165, 233, 0.3));
+}
+
+.login-title {
+    font-size: 36px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #0EA5E9 0%, #10B981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.login-subtitle {
+    font-size: 15px;
+    font-weight: 500;
+    color: #64748B;
+}
+
+/* ==================== ROLE SELECTOR ==================== */
+.role-section-clean {
+    margin-bottom: 32px;
+}
+
+.role-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.role-buttons-clean {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.role-btn-clean {
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 250ms;
+}
+
+.role-btn-clean:hover {
+    border-color: #0EA5E9;
+    background: rgba(14, 165, 233, 0.05);
+    color: #0EA5E9;
+}
+
+.role-btn-clean.active {
+    background: linear-gradient(135deg, #0EA5E9 0%, #10B981 100%);
+    border-color: #0EA5E9;
+    color: white;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+/* ==================== FORM ==================== */
+.form-clean {
+    margin-bottom: 24px;
+}
+
+.form-group-clean {
+    margin-bottom: 24px;
+}
+
+.label-clean {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 10px;
+}
+
+.input-clean {
+    width: 100%;
+    padding: 14px 16px;
+    background: #F8FAFC;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #0F172A;
+    transition: all 200ms;
+    outline: none;
+}
+
+.input-clean::placeholder {
+    color: #94A3B8;
+}
+
+.input-clean:focus {
+    background: white;
+    border-color: #0EA5E9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+/* ==================== PASSWORD WRAPPER ==================== */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .input-clean {
+    padding-right: 48px;
+}
+
+.password-toggle-clean {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    opacity: 0.6;
+    transition: opacity 200ms;
+}
+
+.password-toggle-clean:hover {
+    opacity: 1;
+}
+
+/* ==================== ERROR MESSAGE ==================== */
+.error-message-clean {
+    padding: 12px 16px;
+    background: #FEE2E2;
+    border: 1px solid #FCA5A5;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #991B1B;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* ==================== SUBMIT BUTTON ==================== */
+.submit-btn-clean {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #0EA5E9 0%, #10B981 100%);
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    cursor: pointer;
+    transition: all 250ms;
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+}
+
+.submit-btn-clean:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
+}
+
+.submit-btn-clean:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submit-btn-clean:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* ==================== FOOTER ==================== */
+.footer-clean {
+    text-align: center;
+    padding-top: 24px;
+    border-top: 1px solid #E2E8F0;
+}
+
+.footer-clean p {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748B;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 640px) {
+    .login-card-clean {
+        padding: 36px 28px;
+    }
+
+    .login-title {
+        font-size: 32px;
+    }
+
+    .role-buttons-clean {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        /* Slightly tighter gap on mobile */
+    }
+
+    .role-btn-clean {
+        padding: 10px 4px;
+        /* Reduced specific padding for mobile */
+        font-size: 13px;
+        /* Slightly smaller text */
+    }
+}

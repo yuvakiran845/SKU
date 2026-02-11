@@ -1,0 +1,365 @@
+/* ==========================================
+   TIMETABLE COMPONENT - CLEAN & SIMPLE
+   Table Format with Auto Current Day Highlight
+   ========================================== */
+
+.timetable-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ==================== TODAY'S SCHEDULE CARD ==================== */
+.today-schedule-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.schedule-header h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 6px 0;
+}
+
+.schedule-date {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 600;
+}
+
+.schedule-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(99, 102, 241, 0.08);
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6366f1;
+}
+
+.schedule-badge svg {
+    width: 16px;
+    height: 16px;
+}
+
+.today-classes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.class-slot {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.class-slot:hover {
+    background: white;
+    border-color: #6366f1;
+    transform: translateX(4px);
+}
+
+.class-time {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.class-time svg {
+    width: 14px;
+    height: 14px;
+    color: #6366f1;
+}
+
+.class-subject {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.no-classes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.no-classes svg {
+    margin-bottom: 16px;
+}
+
+.no-classes p {
+    font-size: 15px;
+    color: #6b7280;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ==================== FULL TIMETABLE TABLE ==================== */
+.full-timetable-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.timetable-header {
+    padding: 24px 28px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.timetable-header h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 6px 0;
+}
+
+.timetable-header p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 600;
+}
+
+.timetable-scroll {
+    overflow-x: auto;
+}
+
+/* ==================== TABLE STYLING ==================== */
+.timetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.timetable-table thead {
+    background: #f9fafb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.timetable-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.day-column {
+    position: sticky;
+    left: 0;
+    background: #f9fafb;
+    z-index: 11;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.03);
+}
+
+.break-column {
+    text-align: center !important;
+    color: #f59e0b !important;
+}
+
+.timetable-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.2s ease;
+}
+
+.timetable-table tbody tr:hover {
+    background: #fafbfc;
+}
+
+.today-row {
+    background: rgba(99, 102, 241, 0.04) !important;
+}
+
+.today-row:hover {
+    background: rgba(99, 102, 241, 0.08) !important;
+}
+
+.timetable-table td {
+    padding: 16px;
+    color: #374151;
+    font-weight: 500;
+    border-right: 1px solid #f3f4f6;
+}
+
+.day-cell {
+    position: sticky;
+    left: 0;
+    background: white;
+    font-weight: 800;
+    color: #111827;
+    z-index: 5;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.03);
+}
+
+.today-row .day-cell {
+    background: rgba(99, 102, 241, 0.04);
+    position: relative;
+}
+
+.today-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #6366f1;
+    border-radius: 0 4px 4px 0;
+}
+
+.subject-cell {
+    text-align: center;
+    font-weight: 600;
+    color: #111827;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid #dbeafe;
+}
+
+.lab-cell {
+    background: rgba(139, 92, 246, 0.08) !important;
+    border-color: #e9d5ff !important;
+    color: #7c3aed !important;
+    font-weight: 700;
+}
+
+.empty-cell {
+    background: #f9fafb !important;
+    border: 1px solid #f3f4f6 !important;
+}
+
+.break-cell {
+    text-align: center !important;
+    background: rgba(245, 158, 11, 0.05) !important;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* ==================== FOOTER & LEGEND ==================== */
+.timetable-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 28px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.legend {
+    display: flex;
+    gap: 24px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-dot.blue {
+    background: #3b82f6;
+}
+
+.legend-dot.purple {
+    background: #8b5cf6;
+}
+
+.legend-dot.green {
+    background: #10b981;
+}
+
+.legend-note {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+    .timetable-scroll {
+        padding-bottom: 10px;
+    }
+
+    .timetable-table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .today-schedule-card,
+    .full-timetable-card {
+        border-radius: 12px;
+    }
+
+    .schedule-header {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .class-slot {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .class-time {
+        min-width: auto;
+    }
+
+    .timetable-footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .legend {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+}

@@ -1,0 +1,944 @@
+/* ============================================
+   STRIPE-LEVEL STUDENT DASHBOARD
+   Premium, Elegant, Minimalist
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --primary: #635bff;
+    --primary-dark: #4b45c2;
+    --secondary: #0a2540;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --text-dark: #0a2540;
+    --text-gray: #425466;
+    --bg-light: #f6f9fc;
+    --card-bg: #ffffff;
+    --border-light: #e6ebf1;
+    --shadow-sm: 0 2px 5px rgba(50, 50, 93, 0.05), 0 1px 1px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 13px 27px -5px rgba(50, 50, 93, 0.1), 0 8px 16px -8px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0 30px 60px -12px rgba(50, 50, 93, 0.15), 0 18px 36px -18px rgba(0, 0, 0, 0.15);
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==================== LAYOUT ==================== */
+.dashboard-container-premium {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-main-premium {
+    max-width: 1200px;
+    margin: 40px auto;
+    width: 100%;
+    padding: 0 24px;
+    flex: 1;
+}
+
+/* ==================== NAVBAR ==================== */
+.dashboard-navbar-premium {
+    background: white;
+    box-shadow: var(--shadow-sm);
+    padding: 0 24px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-content {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo-svg {
+    filter: drop-shadow(0 2px 4px rgba(99, 91, 255, 0.2));
+}
+
+.navbar-brand h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.navbar-brand p {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.user-info.clickable {
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.2s;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+.user-info.clickable:hover {
+    background: rgba(99, 91, 255, 0.05);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-right: 12px;
+    padding-right: 12px;
+    border-right: 1px solid var(--border-light);
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(99, 91, 255, 0.3);
+}
+
+.user-details p {
+    margin: 0;
+    line-height: 1.3;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.user-role {
+    font-size: 12px;
+    color: var(--text-gray);
+}
+
+.btn-logout {
+    border: none;
+    background: transparent;
+    color: var(--text-gray);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 16px;
+    transition: all 0.2s;
+    border-radius: 6px;
+}
+
+.btn-logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+/* ==================== MODAL ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 37, 64, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-card {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: var(--shadow-hover);
+    overflow: hidden;
+    animation: slideUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fcfcfd;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: var(--text-gray);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.profile-details {
+    padding: 32px;
+}
+
+.profile-avatar-large {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 32px;
+    box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
+    margin: 0 auto 32px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-size: 14px;
+    color: var(--text-gray);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: var(--text-dark);
+    font-weight: 600;
+    text-align: right;
+}
+
+/* ==================== TABS ==================== */
+.tabs-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    background: white;
+    padding: 6px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    width: fit-content;
+}
+
+.tab-btn-premium {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-gray);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn-premium:hover {
+    color: var(--primary);
+    background: rgba(99, 91, 255, 0.05);
+}
+
+.tab-btn-premium.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 91, 255, 0.25);
+}
+
+/* ==================== OVERVIEW ==================== */
+.overview-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(99, 91, 255, 0.2);
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.card-icon.blue {
+    background: rgba(99, 91, 255, 0.1);
+    color: var(--primary);
+}
+
+.card-icon.purple {
+    background: rgba(172, 81, 255, 0.1);
+    color: #ac51ff;
+}
+
+.card-data h3 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: var(--text-gray);
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.big-number {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: -1.5px;
+}
+
+/* ==================== TODAY'S SCHEDULE ==================== */
+.today-schedule-section {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+.section-header-premium {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 16px;
+}
+
+.section-header-premium h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.section-header-premium p {
+    /* For subtitle in overview/schedule/attendance */
+    font-size: 14px;
+    color: var(--text-gray);
+    margin: 4px 0 0 0;
+}
+
+.date-badge {
+    background: var(--bg-light);
+    color: var(--text-gray);
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.schedule-timeline {
+    position: relative;
+    padding-left: 10px;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.time-col {
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-right: 20px;
+    border-right: 2px solid var(--border-light);
+    position: relative;
+}
+
+.time-start {
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 14px;
+}
+
+.time-end {
+    font-size: 11px;
+    color: var(--text-gray);
+    margin-top: 2px;
+}
+
+.class-line-indicator {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 3px solid var(--primary);
+    border-radius: 50%;
+    position: absolute;
+    left: 94px;
+    /* Adjust according to time-col width */
+    z-index: 2;
+}
+
+.class-details {
+    margin-left: 24px;
+    background: var(--bg-light);
+    padding: 16px 24px;
+    border-radius: 12px;
+    flex: 1;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.class-details:hover {
+    background: white;
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    transform: translateX(4px);
+}
+
+.class-details h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.class-details p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-gray);
+}
+
+/* ==================== ATTENDANCE GRID (PREMIUM) ==================== */
+.attendance-grid-premium {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    /* Increased width */
+    gap: 32px;
+    /* Increased gap */
+}
+
+.subject-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    /* Increased padding */
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.subject-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.subject-header {
+    margin-bottom: 24px;
+}
+
+.subject-header h4 {
+    margin: 0;
+    font-size: 18px;
+    /* Larger subject name */
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.3;
+}
+
+.progress-track-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.progress-track {
+    flex: 1;
+    height: 8px;
+    /* Thicker track */
+    background: #f0f2f5;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 100px;
+}
+
+.percentage-text {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-dark);
+    min-width: 60px;
+    text-align: right;
+}
+
+.subject-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg-light);
+    border-radius: 12px;
+}
+
+.stat-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-pill .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-gray);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.stat-pill .value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Color Coding for Stats */
+.stat-pill.present .value {
+    color: var(--success);
+}
+
+.stat-pill.absent .value {
+    color: var(--danger);
+}
+
+.stat-pill.total .value {
+    color: var(--info);
+}
+
+/* Card status colors mainly affect progress bar */
+.excellent .progress-fill {
+    background: var(--success);
+}
+
+.good .progress-fill {
+    background: var(--info);
+}
+
+.warning .progress-fill {
+    background: var(--warning);
+}
+
+.critical .progress-fill {
+    background: var(--danger);
+}
+
+/* ==================== TIMETABLE (PREMIUM) ==================== */
+.timetable-container-premium {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #000;
+    /* Dark outer border */
+}
+
+.premium-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: center;
+    background: white;
+}
+
+.premium-table thead tr {
+    background-color: #0a2540;
+    color: white;
+    border-bottom: 2px solid #000;
+}
+
+.premium-table th {
+    padding: 18px 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-right: 1px solid #4a5a70;
+}
+
+.premium-table th:last-child {
+    border-right: none;
+}
+
+.day-cell {
+    background-color: #f8f9fa;
+    font-weight: 800;
+    color: var(--text-dark);
+    border-right: 2px solid #000;
+    /* Distinct separation */
+    border-bottom: 1px solid #000;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 16px 12px;
+    width: 120px;
+}
+
+.subject-cell {
+    padding: 16px 12px;
+    border-right: 1px solid #000;
+    /* Dark separator per request */
+    border-bottom: 1px solid #000;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 13px;
+    min-width: 140px;
+    line-height: 1.4;
+}
+
+.subject-cell:last-child {
+    border-right: none;
+}
+
+.lunch-cell {
+    background-color: #fff7ed;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    vertical-align: middle;
+    width: 60px;
+}
+
+.lunch-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #c2410c;
+    text-transform: uppercase;
+    margin: 0 auto;
+    padding: 24px 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==================== ANNOUNCEMENTS ==================== */
+.empty-announcement-state {
+    text-align: center;
+    padding: 100px 0;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--bg-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    color: var(--text-gray);
+}
+
+.empty-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ==================== RESPONSIVE ==================== */
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+
+    /* Layout */
+    .dashboard-main-premium {
+        padding: 0 16px;
+        margin-top: 24px;
+    }
+
+    /* Navbar */
+    .dashboard-navbar-premium {
+        height: 60px;
+        padding: 0 16px;
+    }
+
+    .navbar-brand h2 {
+        font-size: 18px;
+    }
+
+    .navbar-brand p {
+        display: none;
+    }
+
+    .navbar-actions .user-details {
+        display: none;
+    }
+
+    .user-info {
+        margin-right: 8px;
+        padding-right: 8px;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .btn-logout {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Tabs */
+    .tabs-container {
+        width: 100%;
+        overflow-x: auto;
+        padding: 4px;
+    }
+
+    .tab-btn-premium {
+        white-space: nowrap;
+        padding: 8px 16px;
+        font-size: 13px;
+        flex: 1;
+        text-align: center;
+    }
+
+    /* Overview Cards */
+    .overview-cards {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .info-card {
+        padding: 20px;
+        gap: 16px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .card-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .big-number {
+        font-size: 36px;
+    }
+
+    /* Today's Schedule */
+    .today-schedule-section {
+        padding: 20px;
+    }
+
+    .section-header-premium {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .date-badge {
+        font-size: 11px;
+    }
+
+    .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-left: 20px;
+        border-left: 2px solid var(--border-light);
+        padding-left: 16px;
+        padding-bottom: 16px;
+    }
+
+    .time-col {
+        border-right: none;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        min-width: auto;
+        padding: 0;
+        margin-bottom: 4px;
+    }
+
+    .class-line-indicator {
+        left: -22px;
+    }
+
+    .class-details {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Attendance Grid */
+    .attendance-grid-premium {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .subject-card {
+        padding: 20px;
+    }
+
+    .subject-header h4 {
+        font-size: 16px;
+    }
+
+    .percentage-text {
+        font-size: 18px;
+    }
+
+    .subject-stats {
+        gap: 8px;
+    }
+
+    .stat-pill .label {
+        font-size: 9px;
+    }
+
+    .stat-pill .value {
+        font-size: 15px;
+    }
+
+    /* Timetable Table */
+    .timetable-container-premium {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .premium-table {
+        min-width: 600px;
+        /* Allow horizontal scroll */
+        font-size: 11px;
+    }
+
+    .premium-table th,
+    .day-cell,
+    .subject-cell {
+        padding: 10px 8px;
+    }
+
+    .subject-cell {
+        min-width: 100px;
+    }
+}
