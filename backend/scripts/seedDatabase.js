@@ -23,9 +23,9 @@ const seedDatabase = async () => {
         // Create Admin
         console.log('👨‍💼 Creating admin...');
         const admin = await User.create({
-            name: 'Admin User',
-            email: 'sku@admin.edu',
-            password: 'admin123',
+            name: 'System Admin',
+            email: 'admin.portal@skucet.edu',
+            password: 'AdminPortalLogin2026',
             role: 'admin',
             isFirstLogin: false
         });
@@ -34,9 +34,9 @@ const seedDatabase = async () => {
         // Create Faculty
         console.log('👨‍🏫 Creating faculty...');
         const faculty1 = await User.create({
-            name: 'Dr. Rajesh Kumar',
-            email: 'sku@faculty.edu',
-            password: 'faculty123',
+            name: 'Faculty Member',
+            email: 'faculty.portal@skucet.edu',
+            password: 'FacultyPortalLogin2026',
             role: 'faculty',
             employeeId: 'FAC001',
             isFirstLogin: false
@@ -124,7 +124,7 @@ const seedDatabase = async () => {
             const rollNumber = `2310${String(i + 100).padStart(3, '0')}`;
             students.push({
                 name: `Student ${i}`,
-                email: `${rollNumber}@sku.edu`,
+                email: `${rollNumber}@skucet.edu`,
                 password: rollNumber,
                 role: 'student',
                 rollNumber: rollNumber,
@@ -234,9 +234,9 @@ const seedDatabase = async () => {
         console.log(`   - Timetable: 1`);
         console.log(`   - Announcements: ${announcements.length}`);
         console.log('\n📝 Login Credentials:');
-        console.log('   Admin:   sku@admin.edu / admin123');
-        console.log('   Faculty: sku@faculty.edu / faculty123');
-        console.log('   Student: 2310101@sku.edu / 2310101');
+        console.log('   Admin:   admin.portal@skucet.edu / AdminPortalLogin2026');
+        console.log('   Faculty: faculty.portal@skucet.edu / FacultyPortalLogin2026');
+        console.log('   Student: 2310126@skucet.edu / 2310126');
         console.log('='.repeat(60) + '\n');
 
         process.exit(0);
