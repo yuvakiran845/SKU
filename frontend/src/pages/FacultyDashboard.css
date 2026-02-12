@@ -639,37 +639,43 @@
         gap: 1rem;
     }
 
-    /* Student Grid */
+    /* Student Grid - Mobile Optimized */
     .students-grid {
         grid-template-columns: repeat(2, 1fr);
-        /* 2 columns for better density */
         gap: 10px;
-        padding: 1rem;
-        max-height: 55vh;
-        /* Better scroll area on mobile */
+        padding: 10px;
+        max-height: 60vh;
     }
 
     .student-card {
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between;
-        padding: 1rem;
+        justify-content: center;
+        padding: 12px 8px;
+        text-align: center;
+        min-height: 110px;
     }
 
-    .student-info {
-        /* Assuming wrapper div exists or implicitly modifying layout */
-        flex: 1;
-        min-width: 0;
-        /* truncate text */
-        margin-right: 1rem;
+    .student-roll {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+        color: var(--text-light);
     }
 
     .student-name {
-        margin-bottom: 2px;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .status-badge {
+        font-size: 0.7rem;
+        padding: 4px 10px;
         align-self: center;
+        /* Center badge */
     }
 
     /* Action Footer */
@@ -677,35 +683,45 @@
         flex-direction: column;
         gap: 1rem;
         padding: 1rem;
-        margin: 0 -1rem -1rem -1rem;
-        width: calc(100% + 2rem);
+        margin: 0 -1.5rem -2rem -1.5rem;
+        /* Match panel padding negation */
+        width: calc(100% + 3rem);
+        border-radius: 0;
     }
 
     .summary {
         width: 100%;
-        justify-content: space-around;
-        font-size: 1rem;
+        justify-content: space-between;
+        font-size: 0.95rem;
+        padding: 0 1rem;
     }
 
     .btn-finalize {
-        width: 100%;
-        padding: 0.75rem;
+        width: 90%;
+        padding: 0.8rem;
+        font-size: 1rem;
     }
 
     /* Timetable */
     .timetable-container-premium {
-        padding: 1rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+    }
+
+    .table-wrapper {
+        border-radius: 8px;
     }
 
     .premium-table {
         min-width: 600px;
+        /* Enable horizontal scroll */
         font-size: 11px;
     }
 
     .premium-table th,
     .day-cell,
     .subject-cell {
-        padding: 8px;
+        padding: 8px 4px;
     }
 
     /* Legend Mobile */

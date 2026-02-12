@@ -191,18 +191,35 @@ const AdminDashboard = () => {
     const periods = [1, 2, 3, 4, 5, 6];
 
     return (
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    return (
         <div className="admin-layout">
+            {/* Mobile Sidebar Toggle */}
+            <button className="mobile-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            {/* Overlay for Mobile */}
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
             {/* Sidebar */}
-            <aside className="sidebar">
+            <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-brand">
                     <img src="/skucet-logo.svg" alt="Logo" width="32" />
                     <h2>Admin Portal</h2>
+                    {/* Close button for mobile */}
+                    <button className="mobile-close-btn" onClick={() => setIsSidebarOpen(false)}>×</button>
                 </div>
 
                 <nav className="nav-links">
                     <button
                         className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('overview')}
+                        onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }}
                         title="Overview"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -215,7 +232,7 @@ const AdminDashboard = () => {
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'timetable' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('timetable')}
+                        onClick={() => { setActiveTab('timetable'); setIsSidebarOpen(false); }}
                         title="Timetable Management"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -228,7 +245,7 @@ const AdminDashboard = () => {
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'students' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('students')}
+                        onClick={() => { setActiveTab('students'); setIsSidebarOpen(false); }}
                         title="Students"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -241,7 +258,7 @@ const AdminDashboard = () => {
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'faculty' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('faculty')}
+                        onClick={() => { setActiveTab('faculty'); setIsSidebarOpen(false); }}
                         title="Faculty"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -252,7 +269,7 @@ const AdminDashboard = () => {
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'subjects' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('subjects')}
+                        onClick={() => { setActiveTab('subjects'); setIsSidebarOpen(false); }}
                         title="Subjects"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
