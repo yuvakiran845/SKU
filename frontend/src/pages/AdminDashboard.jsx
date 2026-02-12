@@ -38,6 +38,7 @@ const AdminDashboard = () => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [userModalType, setUserModalType] = useState('student'); // 'student' | 'faculty' | 'subject'
     const [formData, setFormData] = useState({}); // Generic form holder
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         fetchAllData();
@@ -189,9 +190,6 @@ const AdminDashboard = () => {
 
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const periods = [1, 2, 3, 4, 5, 6];
-
-    return (
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <div className="admin-layout">
