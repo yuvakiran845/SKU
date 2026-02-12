@@ -627,11 +627,28 @@ body {
         padding: 5rem 1rem 1rem 1rem;
         /* Top padding for toggle button */
         margin: 0;
+        width: 100%;
+        overflow-x: hidden;
+        /* Prevent body scroll from main content */
     }
 
-    /* Hide horizontal scrollbar logic */
-    .nav-links::-webkit-scrollbar {
-        width: 0px;
+    /* Force horizontal scroll for containers */
+    .timetable-editor,
+    .glass-card,
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+        /* Ensure block formatting context */
+    }
+
+    /* Ensure tables have a min-width to trigger scroll */
+    .timetable-grid,
+    .data-table {
+        min-width: 600px;
+        /* Minimum width to force scroll */
+        width: 100%;
     }
 }
 
