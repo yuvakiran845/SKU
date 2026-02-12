@@ -281,43 +281,87 @@ exports.seedProductionDatabase = async (req, res) => {
 
         // 4. Create Students (64 students)
         const students = [];
-        // Base Roll Number: 2310101 to 2310164
-        // Logic: 2310 + (100 + i)
 
-        for (let i = 1; i <= 64; i++) {
-            const rollSuffix = 100 + i;
-            const rollNumber = `2310${rollSuffix}`;
+        // Exact Mapping from Register Images
+        const studentData = [
+            { roll: '2310101', name: 'A. Lochan Kumar' },
+            // 102 skipped
+            // 103 skipped
+            { roll: '2310104', name: 'B. Mahesh Babu' },
+            { roll: '2310105', name: 'B. Sharada' },
+            { roll: '2310106', name: 'B. Ashwini' },
+            { roll: '2310107', name: 'B. Chandra Sekhar' },
+            { roll: '2310108', name: 'B. Reethika' },
+            { roll: '2310109', name: 'D. Nandini' },
+            { roll: '2310110', name: 'D. Rajesh' },
+            { roll: '2310111', name: 'E. Manasa' },
+            { roll: '2310112', name: 'G. Sneha Sree' },
+            { roll: '2310113', name: 'G. Likitha' },
+            { roll: '2310114', name: 'G. Siddhartha' },
+            { roll: '2310115', name: 'G. Chandra Sekhar Yadav' },
+            { roll: '2310116', name: 'G. Jayanthi' },
+            { roll: '2310117', name: 'J. Mythri' },
+            // 118 skipped
+            { roll: '2310119', name: 'K. Jyothi' },
+            { roll: '2310120', name: 'K. Pavanitha' },
+            { roll: '2310121', name: 'K. Bharath Kumar Reddy' },
+            { roll: '2310122', name: 'K. Abhilash' },
+            { roll: '2310123', name: 'K. Nanda Kishore' },
+            { roll: '2310124', name: 'K. Keerthana' },
+            { roll: '2310125', name: 'M. Padhma Sree' },
+            { roll: '2310126', name: 'M. Vijaya Lakshmi' },
+            { roll: '2310127', name: 'M. Kathyaini' },
+            { roll: '2310128', name: 'M. Uchirappa' },
+            { roll: '2310129', name: 'M. Naveena' },
+            { roll: '2310130', name: 'M. Purushotham' },
+            { roll: '2310131', name: 'M. Yogeswari' },
+            { roll: '2310132', name: 'N. Pallavi' },
+            { roll: '2310133', name: 'N. Swarna Latha' },
+            { roll: '2310134', name: 'N. Siva Vara Prasad' },
+            { roll: '2310135', name: 'P. Bhaskar' },
+            { roll: '2310136', name: 'P. Lakshmi' },
+            { roll: '2310137', name: 'P. Vidhya Sree' },
+            { roll: '2310138', name: 'P. Ankitha' },
+            { roll: '2310139', name: 'P. Aparna' },
+            { roll: '2310140', name: 'P. Sravani' },
+            { roll: '2310141', name: 'P. Susmitha Das' },
+            { roll: '2310142', name: 'P. Bharya Sree' },
+            { roll: '2310143', name: 'R. Chetana' },
+            { roll: '2310144', name: 'S. Abhiram' },
+            { roll: '2310145', name: 'S. Divya Sree' },
+            { roll: '2310146', name: 'S. Mehataj' },
+            { roll: '2310147', name: 'S. Ujala Mashiya' },
+            { roll: '2310148', name: 'S. Tejaswini' },
+            { roll: '2310149', name: 'S. Vishnu' },
+            { roll: '2310150', name: 'S. R. Triveni' },
+            { roll: '2310151', name: 'T. Sathyavathi' },
+            { roll: '2310152', name: 'T. Tharun Kumar' },
+            { roll: '2310153', name: 'U. Divyanjali' },
+            { roll: '2310154', name: 'U. Usharani' },
+            { roll: '2310155', name: 'U. Veereshamma' },
+            { roll: '2310156', name: 'V. Vinod Kumar' },
+            { roll: '2310157', name: 'V. Surya' },
+            { roll: '2310158', name: 'V. Kalyan Reddy' },
+            { roll: '2310159', name: 'V. Upekshith' },
+            { roll: '2310160', name: 'Y. Sai Priya' },
+            { roll: '2310171', name: 'C. Kavya' },
+            { roll: '2310172', name: 'D. Deekshith' },
+            { roll: '2310173', name: 'D. Hareesh' },
+            { roll: '2310174', name: 'G. Vamsi Madhukar' },
+            { roll: '2310175', name: 'M. Manoj' },
+            { roll: '2310176', name: 'R. Bhanu Prakash' },
+            { roll: '2310177', name: 'V. Venkatesh' },
+        ];
 
-            const studentNames = [
-                'Lochan Kumar', 'M. Vijaya Lakhsmi', 'A. Sai Teja', 'B. Praneeth', 'C. Hema Latha',
-                'D. Gopi Krishna', 'E. Suresh', 'F. Anusha', 'G. Ravi Teja', 'H. Sravani',
-                'I. Manoj Kumar', 'J. Divya', 'K. Sai Kumar', 'L. Pavani', 'M. Naveen',
-                'N. Swathi', 'O. Karthik', 'P. Ramya', 'Q. Harish', 'R. Manasa',
-                'S. Praveen', 'T. Sandhya', 'U. Vamshi', 'V. Aparna', 'W. Akhil',
-                'X. Bhavana', 'Y. Charan', 'Z. Deepa', 'A. Eswar', 'B. Fathima',
-                'C. Ganesh', 'D. Harika', 'E. Imran', 'F. Jaswanth', 'G. Keerthi',
-                'H. Lokesh', 'I. Mounika', 'J. Nikhil', 'K. Omprakash', 'L. Prathyusha',
-                'M. Qasim', 'N. Rajesh', 'O. Sai Kiran', 'P. Tarun', 'Q. Uma',
-                'R. Vinay', 'S. Yamini', 'T. Zareena', 'U. Akshay', 'V. Bindu',
-                'W. Chandu', 'X. Dinesh', 'Y. Eshwar', 'Z. Farhan', 'A. Giridhar',
-                'B. Harini', 'C. Ishwarya', 'D. Jagadeesh', 'E. Kavya', 'F. Lakshmi',
-                'G. Madhu', 'H. Narender', 'I. Pallavi', 'J. Rakesh'
-            ];
-
-            let name = studentNames[i - 1] || `Student ${rollSuffix}`;
-
-            // Hardcode specific requests
-            if (rollNumber === '2310101') name = 'Lochan Kumar';
-            if (rollNumber === '2310126') name = 'M. Vijaya Lakhsmi';
-
+        for (const data of studentData) {
             students.push({
-                name: name,
-                email: `${rollNumber}@skucet.edu`,
-                password: rollNumber,
+                name: data.name,
+                email: `${data.roll}@skucet.edu`,
+                password: data.roll,
                 role: 'student',
-                rollNumber: rollNumber,
+                rollNumber: data.roll,
                 branch: 'CSE',
-                semester: 6,
+                semester: 6, // 3rd Year 2nd Sem
                 isFirstLogin: false,
                 subjects: allSubjectIds
             });
