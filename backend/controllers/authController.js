@@ -288,18 +288,36 @@ exports.seedProductionDatabase = async (req, res) => {
             const rollSuffix = 100 + i;
             const rollNumber = `2310${rollSuffix}`;
 
-            let name = `Student ${rollSuffix}`;
+            const studentNames = [
+                'Lochan Kumar', 'M. Vijaya Lakhsmi', 'A. Sai Teja', 'B. Praneeth', 'C. Hema Latha',
+                'D. Gopi Krishna', 'E. Suresh', 'F. Anusha', 'G. Ravi Teja', 'H. Sravani',
+                'I. Manoj Kumar', 'J. Divya', 'K. Sai Kumar', 'L. Pavani', 'M. Naveen',
+                'N. Swathi', 'O. Karthik', 'P. Ramya', 'Q. Harish', 'R. Manasa',
+                'S. Praveen', 'T. Sandhya', 'U. Vamshi', 'V. Aparna', 'W. Akhil',
+                'X. Bhavana', 'Y. Charan', 'Z. Deepa', 'A. Eswar', 'B. Fathima',
+                'C. Ganesh', 'D. Harika', 'E. Imran', 'F. Jaswanth', 'G. Keerthi',
+                'H. Lokesh', 'I. Mounika', 'J. Nikhil', 'K. Omprakash', 'L. Prathyusha',
+                'M. Qasim', 'N. Rajesh', 'O. Sai Kiran', 'P. Tarun', 'Q. Uma',
+                'R. Vinay', 'S. Yamini', 'T. Zareena', 'U. Akshay', 'V. Bindu',
+                'W. Chandu', 'X. Dinesh', 'Y. Eshwar', 'Z. Farhan', 'A. Giridhar',
+                'B. Harini', 'C. Ishwarya', 'D. Jagadeesh', 'E. Kavya', 'F. Lakshmi',
+                'G. Madhu', 'H. Narender', 'I. Pallavi', 'J. Rakesh'
+            ];
+
+            let name = studentNames[i - 1] || `Student ${rollSuffix}`;
+
+            // Hardcode specific requests
             if (rollNumber === '2310101') name = 'Lochan Kumar';
             if (rollNumber === '2310126') name = 'M. Vijaya Lakhsmi';
 
             students.push({
                 name: name,
-                email: `${rollNumber}@skucet.edu`, // Or sku.edu? User said skucet.edu for 2310126
+                email: `${rollNumber}@skucet.edu`,
                 password: rollNumber,
                 role: 'student',
                 rollNumber: rollNumber,
                 branch: 'CSE',
-                semester: 6, // 3rd Year 2nd Sem
+                semester: 6,
                 isFirstLogin: false,
                 subjects: allSubjectIds
             });
