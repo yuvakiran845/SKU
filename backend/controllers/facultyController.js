@@ -240,12 +240,13 @@ exports.enterMarks = async (req, res) => {
             });
         }
 
-        if (subject.faculty.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: 'Not authorized to enter marks for this subject'
-            });
-        }
+        // Shared portal: Removed strict faculty check
+        // if (subject.faculty.toString() !== req.user._id.toString()) {
+        //     return res.status(403).json({
+        //         success: false,
+        //         message: 'Not authorized to enter marks for this subject'
+        //     });
+        // }
 
         // Verify student exists
         const student = await User.findById(studentId);
@@ -308,12 +309,13 @@ exports.getMarksBySubject = async (req, res) => {
             });
         }
 
-        if (subject.faculty.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: 'Not authorized'
-            });
-        }
+        // Shared portal: Removed strict faculty check
+        // if (subject.faculty.toString() !== req.user._id.toString()) {
+        //     return res.status(403).json({
+        //         success: false,
+        //         message: 'Not authorized'
+        //     });
+        // }
 
         const marks = await Marks.find({ subject: subjectId })
             .populate('student', 'name rollNumber')
@@ -359,10 +361,18 @@ exports.postAnnouncement = async (req, res) => {
             // Verify faculty teaches this subject
             const subject = await Subject.findById(subjectId);
 
-            if (!subject || subject.faculty.toString() !== req.user._id.toString()) {
-                return res.status(403).json({
+            // Shared portal: Removed strict faculty check
+            // if (!subject || subject.faculty.toString() !== req.user._id.toString()) {
+            //     return res.status(403).json({
+            //         success: false,
+            //         message: 'Not authorized to post for this subject'
+            //     });
+            // }
+
+            if (!subject) {
+                return res.status(404).json({
                     success: false,
-                    message: 'Not authorized to post for this subject'
+                    message: 'Subject not found'
                 });
             }
 

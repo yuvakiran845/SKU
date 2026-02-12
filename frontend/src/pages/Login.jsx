@@ -197,6 +197,34 @@ const Login = () => {
 
                     <div className="footer-clean">
                         <p>© 2026 SKUCET - Computer Science Department</p>
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                if (window.confirm('This will RESET the database to default state (64 Students, Faculty, Admin). Continue?')) {
+                                    try {
+                                        setLoading(true);
+                                        const res = await authAPI.seedProduction();
+                                        alert(res.data.message);
+                                    } catch (err) {
+                                        alert('Failed to seed database');
+                                        console.error(err);
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }
+                            }}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#666',
+                                fontSize: '0.7rem',
+                                marginTop: '10px',
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                            }}
+                        >
+                            Fix Database / Reset Data
+                        </button>
                     </div>
                 </div>
             </div>

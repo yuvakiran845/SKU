@@ -91,6 +91,11 @@ export const authAPI = {
         USE_MOCK_API
             ? mockAPI.refreshToken(refreshToken)
             : api.post('/auth/refresh', { refreshToken }),
+
+    seedProduction: () =>
+        USE_MOCK_API
+            ? Promise.resolve({ data: { message: 'Mock data reset' } })
+            : api.get('/auth/seed-production'),
 };
 
 // ===========================

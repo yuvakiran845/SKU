@@ -1,17 +1,39 @@
 // Mock data for testing without backend
+
+// Mock subjects
+export const mockSubjects = [
+    { id: 'sub_1', code: 'BDA', name: 'Big Data Analytics', credits: 4 },
+    { id: 'sub_2', code: 'BDA-LAB', name: 'Big Data Analytics Lab', credits: 2 },
+    { id: 'sub_3', code: 'C&NS', name: 'Cryptography & Network Security', credits: 4 },
+    { id: 'sub_4', code: 'CC', name: 'Cloud Computing', credits: 4 },
+    { id: 'sub_5', code: 'EI', name: 'Electronic Instrumentation (OE-II)', credits: 3 },
+    { id: 'sub_6', code: 'LIB', name: 'Library', credits: 1 },
+    { id: 'sub_7', code: 'ML', name: 'Machine Learning', credits: 4 },
+    { id: 'sub_8', code: 'SOC', name: 'SOC Skill Lab', credits: 2 },
+    { id: 'sub_9', code: 'STM', name: 'Software Testing Methodologies', credits: 3 },
+    { id: 'sub_10', code: 'TPR', name: 'Technical Paper Writing', credits: 1 }
+];
+
 export const mockUsers = {
-    // Students (50 students)
-    students: Array.from({ length: 50 }, (_, i) => {
-        const rollNumber = `2310${String(i + 101).padStart(3, '0')}`;
+    // Students (64 students)
+    students: Array.from({ length: 64 }, (_, i) => {
+        const rollSuffix = 101 + i;
+        const rollNumber = `2310${String(rollSuffix)}`;
+        const email = `${rollNumber}@skucet.edu`;
+
+        let name = `Student ${rollSuffix}`;
+        if (rollNumber === '2310101') name = 'Lochan Kumar';
+        if (rollNumber === '2310126') name = 'M. Vijaya Lakhsmi';
+
         return {
             id: `student_${i + 1}`,
-            email: `${rollNumber}@sku.edu`,
+            email: email,
             password: rollNumber,
-            name: `Student ${i + 1}`,
+            name: name,
             role: 'student',
             rollNumber,
             branch: 'CSE',
-            semester: 3,
+            semester: 6,
             isFirstLogin: false
         };
     }),
@@ -19,33 +41,24 @@ export const mockUsers = {
     // Faculty
     faculty: {
         id: 'faculty_1',
-        email: 'sku@faculty.edu',
-        password: 'faculty123',
-        name: 'Dr. Rajesh Kumar',
+        email: 'faculty.portal@skucet.edu',
+        password: 'FacultyPortalLogin2026',
+        name: 'Faculty Staff',
         role: 'faculty',
-        employeeId: 'FAC001',
+        employeeId: 'SHARED001',
         isFirstLogin: false
     },
 
     // Admin
     admin: {
         id: 'admin_1',
-        email: 'sku@admin.edu',
-        password: 'admin123',
-        name: 'Admin User',
+        email: 'admin.portal@skucet.edu',
+        password: 'AdminPortalLogin2026',
+        name: 'System Admin',
         role: 'admin',
         isFirstLogin: false
     }
 };
-
-// Mock subjects
-export const mockSubjects = [
-    { id: 'sub_1', code: 'CSE301', name: 'Data Structures', credits: 4 },
-    { id: 'sub_2', code: 'CSE302', name: 'Database Management Systems', credits: 4 },
-    { id: 'sub_3', code: 'CSE303', name: 'Operating Systems', credits: 4 },
-    { id: 'sub_4', code: 'CSE304', name: 'Computer Networks', credits: 4 },
-    { id: 'sub_5', code: 'CSE305', name: 'Software Engineering', credits: 3 }
-];
 
 // Generate mock attendance for a student
 export const generateMockAttendance = (studentId) => {
@@ -85,96 +98,74 @@ export const generateMockMarks = (studentId) => {
 
 // Mock timetable
 export const mockTimetable = [
-    // Monday
-    { day: 'Monday', period: 1, startTime: '09:00 AM', endTime: '10:00 AM', subjectName: 'Data Structures', facultyName: 'Dr. Rajesh Kumar' },
-    { day: 'Monday', period: 2, startTime: '10:00 AM', endTime: '11:00 AM', subjectName: 'Database Management Systems', facultyName: 'Dr. Priya Sharma' },
-    { day: 'Monday', period: 3, startTime: '11:15 AM', endTime: '12:15 PM', subjectName: 'Operating Systems', facultyName: 'Prof. Amit Singh' },
-    { day: 'Monday', period: 4, startTime: '12:15 PM', endTime: '01:15 PM', subjectName: 'Computer Networks', facultyName: 'Dr. Sunita Reddy' },
-
-    // Tuesday
-    { day: 'Tuesday', period: 1, startTime: '09:00 AM', endTime: '10:00 AM', subjectName: 'Software Engineering', facultyName: 'Dr. Vijay Patel' },
-    { day: 'Tuesday', period: 2, startTime: '10:00 AM', endTime: '11:00 AM', subjectName: 'Data Structures', facultyName: 'Dr. Rajesh Kumar' },
-    { day: 'Tuesday', period: 3, startTime: '11:15 AM', endTime: '12:15 PM', subjectName: 'Database Management Systems', facultyName: 'Dr. Priya Sharma' },
-    { day: 'Tuesday', period: 4, startTime: '12:15 PM', endTime: '01:15 PM', subjectName: 'Operating Systems', facultyName: 'Prof. Amit Singh' },
-
-    // Wednesday
-    { day: 'Wednesday', period: 1, startTime: '09:00 AM', endTime: '10:00 AM', subjectName: 'Computer Networks', facultyName: 'Dr. Sunita Reddy' },
-    { day: 'Wednesday', period: 2, startTime: '10:00 AM', endTime: '11:00 AM', subjectName: 'Software Engineering', facultyName: 'Dr. Vijay Patel' },
-    { day: 'Wednesday', period: 3, startTime: '11:15 AM', endTime: '12:15 PM', subjectName: 'Data Structures Lab', facultyName: 'Dr. Rajesh Kumar' },
-    { day: 'Wednesday', period: 4, startTime: '12:15 PM', endTime: '01:15 PM', subjectName: 'Data Structures Lab', facultyName: 'Dr. Rajesh Kumar' },
-
     // Thursday
-    { day: 'Thursday', period: 1, startTime: '09:00 AM', endTime: '10:00 AM', subjectName: 'Database Management Systems', facultyName: 'Dr. Priya Sharma' },
-    { day: 'Thursday', period: 2, startTime: '10:00 AM', endTime: '11:00 AM', subjectName: 'Operating Systems', facultyName: 'Prof. Amit Singh' },
-    { day: 'Thursday', period: 3, startTime: '11:15 AM', endTime: '12:15 PM', subjectName: 'Computer Networks', facultyName: 'Dr. Sunita Reddy' },
-    { day: 'Thursday', period: 4, startTime: '12:15 PM', endTime: '01:15 PM', subjectName: 'Software Engineering', facultyName: 'Dr. Vijay Patel' },
+    { day: 'Thursday', period: 1, startTime: '09:30 AM', endTime: '10:30 AM', subjectName: 'Cryptography & Network Security', facultyName: 'Smt. Chandrakala' },
+    { day: 'Thursday', period: 2, startTime: '10:30 AM', endTime: '11:30 AM', subjectName: 'Cloud Computing', facultyName: 'Dr. P R Rajesh Kumar' },
+    { day: 'Thursday', period: 3, startTime: '11:30 AM', endTime: '12:30 PM', subjectName: 'Electronic Instrumentation', facultyName: 'Mr. D. Purushotam Reddy' },
+    { day: 'Thursday', period: 4, startTime: '01:30 PM', endTime: '02:30 PM', subjectName: 'Big Data Analytics', facultyName: 'Smt. D Gousiya Begum' },
+    { day: 'Thursday', period: 5, startTime: '02:30 PM', endTime: '03:30 PM', subjectName: 'Software Testing Methodologies', facultyName: 'Mr. U Dhanunjaya' },
+    { day: 'Thursday', period: 6, startTime: '03:30 PM', endTime: '04:30 PM', subjectName: 'Library', facultyName: 'Dr. P R Rajesh Kumar' },
 
     // Friday
-    { day: 'Friday', period: 1, startTime: '09:00 AM', endTime: '10:00 AM', subjectName: 'Data Structures', facultyName: 'Dr. Rajesh Kumar' },
-    { day: 'Friday', period: 2, startTime: '10:00 AM', endTime: '11:00 AM', subjectName: 'DBMS Lab', facultyName: 'Dr. Priya Sharma' },
-    { day: 'Friday', period: 3, startTime: '11:15 AM', endTime: '12:15 PM', subjectName: 'DBMS Lab', facultyName: 'Dr. Priya Sharma' },
-    { day: 'Friday', period: 4, startTime: '12:15 PM', endTime: '01:15 PM', subjectName: 'Operating Systems', facultyName: 'Prof. Amit Singh' },
+    { day: 'Friday', period: 1, startTime: '09:30 AM', endTime: '10:30 AM', subjectName: 'Electronic Instrumentation', facultyName: 'Mr. D. Purushotam Reddy' },
+    { day: 'Friday', period: 2, startTime: '10:30 AM', endTime: '11:30 AM', subjectName: 'Machine Learning', facultyName: 'Smt. R. Sumathi' },
+    { day: 'Friday', period: 3, startTime: '11:30 AM', endTime: '12:30 PM', subjectName: 'Big Data Analytics', facultyName: 'Smt. D Gousiya Begum' },
+    { day: 'Friday', period: 4, startTime: '01:30 PM', endTime: '02:30 PM', subjectName: 'SOC Skill Lab', facultyName: 'Dr. Shakila' },
+    { day: 'Friday', period: 5, startTime: '02:30 PM', endTime: '03:30 PM', subjectName: 'SOC Skill Lab', facultyName: 'Dr. Shakila' },
+    { day: 'Friday', period: 6, startTime: '03:30 PM', endTime: '04:30 PM', subjectName: 'SOC Skill Lab', facultyName: 'Dr. Shakila' },
 
     // Saturday
-    { day: 'Saturday', period: 1, startTime: '09:00 AM', endTime: '10:00 AM', subjectName: 'Computer Networks', facultyName: 'Dr. Sunita Reddy' },
-    { day: 'Saturday', period: 2, startTime: '10:00 AM', endTime: '11:00 AM', subjectName: 'Software Engineering', facultyName: 'Dr. Vijay Patel' },
+    { day: 'Saturday', period: 1, startTime: '09:30 AM', endTime: '10:30 AM', subjectName: 'Cloud Computing', facultyName: 'Dr. P R Rajesh Kumar' },
+    { day: 'Saturday', period: 2, startTime: '10:30 AM', endTime: '11:30 AM', subjectName: 'Electronic Instrumentation', facultyName: 'Mr. D. Purushotam Reddy' },
+    { day: 'Saturday', period: 3, startTime: '11:30 AM', endTime: '12:30 PM', subjectName: 'Big Data Analytics', facultyName: 'Smt. D Gousiya Begum' },
+    { day: 'Saturday', period: 4, startTime: '01:30 PM', endTime: '02:30 PM', subjectName: 'Cryptography & Network Security', facultyName: 'Smt. Chandrakala' },
+    { day: 'Saturday', period: 5, startTime: '02:30 PM', endTime: '03:30 PM', subjectName: 'Technical Paper Writing', facultyName: 'Smt. D Gousiya Begum' },
+    { day: 'Saturday', period: 6, startTime: '03:30 PM', endTime: '04:30 PM', subjectName: 'Technical Paper Writing', facultyName: 'Smt. D Gousiya Begum' },
+
+    // Monday
+    { day: 'Monday', period: 1, startTime: '09:30 AM', endTime: '10:30 AM', subjectName: 'Big Data Analytics', facultyName: 'Smt. D Gousiya Begum' },
+    { day: 'Monday', period: 2, startTime: '10:30 AM', endTime: '11:30 AM', subjectName: 'Machine Learning', facultyName: 'Smt. R. Sumathi' },
+    { day: 'Monday', period: 3, startTime: '11:30 AM', endTime: '12:30 PM', subjectName: 'Cloud Computing', facultyName: 'Dr. P R Rajesh Kumar' },
+    { day: 'Monday', period: 4, startTime: '01:30 PM', endTime: '02:30 PM', subjectName: 'Software Testing Methodologies', facultyName: 'Mr. U Dhanunjaya' },
+    { day: 'Monday', period: 5, startTime: '02:30 PM', endTime: '03:30 PM', subjectName: 'Cryptography & Network Security', facultyName: 'Smt. Chandrakala' },
+    { day: 'Monday', period: 6, startTime: '03:30 PM', endTime: '04:30 PM', subjectName: 'Electronic Instrumentation', facultyName: 'Mr. D. Purushotam Reddy' },
+
+    // Tuesday
+    { day: 'Tuesday', period: 1, startTime: '09:30 AM', endTime: '10:30 AM', subjectName: 'Machine Learning', facultyName: 'Smt. R. Sumathi' },
+    { day: 'Tuesday', period: 2, startTime: '10:30 AM', endTime: '11:30 AM', subjectName: 'Software Testing Methodologies', facultyName: 'Mr. U Dhanunjaya' },
+    { day: 'Tuesday', period: 3, startTime: '11:30 AM', endTime: '12:30 PM', subjectName: 'Cryptography & Network Security', facultyName: 'Smt. Chandrakala' },
+    { day: 'Tuesday', period: 4, startTime: '01:30 PM', endTime: '02:30 PM', subjectName: 'Big Data Analytics Lab', facultyName: 'Smt. D Gousiya Begum' },
+    { day: 'Tuesday', period: 5, startTime: '02:30 PM', endTime: '03:30 PM', subjectName: 'Big Data Analytics Lab', facultyName: 'Smt. D Gousiya Begum' },
+    { day: 'Tuesday', period: 6, startTime: '03:30 PM', endTime: '04:30 PM', subjectName: 'Big Data Analytics Lab', facultyName: 'Smt. D Gousiya Begum' },
+
+    // Wednesday
+    { day: 'Wednesday', period: 1, startTime: '09:30 AM', endTime: '10:30 AM', subjectName: 'Cloud Computing', facultyName: 'Dr. P R Rajesh Kumar' },
+    { day: 'Wednesday', period: 2, startTime: '10:30 AM', endTime: '11:30 AM', subjectName: 'Electronic Instrumentation', facultyName: 'Mr. D. Purushotam Reddy' },
+    { day: 'Wednesday', period: 3, startTime: '11:30 AM', endTime: '12:30 PM', subjectName: 'Machine Learning', facultyName: 'Smt. R. Sumathi' },
+    { day: 'Wednesday', period: 4, startTime: '01:30 PM', endTime: '02:30 PM', subjectName: 'Software Testing Methodologies', facultyName: 'Mr. U Dhanunjaya' },
+    { day: 'Wednesday', period: 5, startTime: '02:30 PM', endTime: '03:30 PM', subjectName: 'Library', facultyName: 'Dr. P R Rajesh Kumar' },
+    { day: 'Wednesday', period: 6, startTime: '03:30 PM', endTime: '04:30 PM', subjectName: 'Technical Paper Writing', facultyName: 'Smt. D Gousiya Begum' },
 ];
 
 // Mock announcements
 export const mockAnnouncements = [
     {
         id: 'ann_1',
-        title: 'Mid-Term Examination Schedule Released',
-        message: 'The Mid-2 examination schedule has been released. Please check the notice board for detailed timings and venues.',
+        title: 'Welcome to the New Semester',
+        message: 'Classes for the 3rd Year 2nd Semester have commenced. Please check your timetable.',
         targetRole: 'student',
         subjectName: null,
-        createdAt: new Date('2026-02-03').toISOString(),
+        createdAt: new Date().toISOString(),
         createdBy: 'Admin'
     },
     {
         id: 'ann_2',
-        title: 'Database Lab Cancelled - 5th Feb',
-        message: 'The DBMS Lab scheduled for 5th February is cancelled due to faculty unavailability. Make-up class will be announced soon.',
+        title: 'Data Analytics Workshop',
+        message: 'A workshop on Big Data using Hadoop will be conducted this Saturday. Interested students register with Smt. D Gousiya Begum.',
         targetRole: 'student',
-        subjectName: 'Database Management Systems',
-        createdAt: new Date('2026-02-04').toISOString(),
-        createdBy: 'Dr. Priya Sharma'
-    },
-    {
-        id: 'ann_3',
-        title: 'Data Structures Assignment Submission',
-        message: 'Assignment on Trees and Graphs is due by 10th February. Late submissions will not be accepted.',
-        targetRole: 'student',
-        subjectName: 'Data Structures',
-        createdAt: new Date('2026-02-01').toISOString(),
-        createdBy: 'Dr. Rajesh Kumar'
-    },
-    {
-        id: 'ann_4',
-        title: 'Guest Lecture on Cloud Computing',
-        message: 'We are organizing a guest lecture on Cloud Computing and DevOps on 8th February at 2 PM in the seminar hall. All students are encouraged to attend.',
-        targetRole: 'student',
-        subjectName: null,
-        createdAt: new Date('2026-01-30').toISOString(),
-        createdBy: 'HOD - CSE Department'
-    },
-    {
-        id: 'ann_5',
-        title: 'Software Engineering Project Presentations',
-        message: 'Final project presentations for Software Engineering will be held from 15th to 20th February. Groups should prepare their demos and documentation.',
-        targetRole: 'student',
-        subjectName: 'Software Engineering',
-        createdAt: new Date('2026-01-28').toISOString(),
-        createdBy: 'Dr. Vijay Patel'
-    },
-    {
-        id: 'ann_6',
-        title: 'Library Timing Extended During Exams',
-        message: 'The library will remain open until 10 PM during the examination period. Students can utilize this extended time for preparation.',
-        targetRole: 'student',
-        subjectName: null,
-        createdAt: new Date('2026-01-25').toISOString(),
-        createdBy: 'Librarian'
+        subjectName: 'Big Data Analytics',
+        createdAt: new Date().toISOString(),
+        createdBy: 'Smt. D Gousiya Begum'
     }
 ];
 

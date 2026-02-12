@@ -307,11 +307,17 @@ const FacultyDashboard = () => {
                                             style={{ border: '2px solid black', fontWeight: '500' }}
                                         >
                                             <option value="" disabled>Select a subject</option>
-                                            {subjects.map(s => (
-                                                <option key={s._id} value={s._id}>
-                                                    {s.name} - {s.faculty?.name || 'Unknown Faculty'}
-                                                </option>
-                                            ))}
+                                            {subjects.map(s => {
+                                                let facultyName = 'Unknown Faculty';
+                                                if (s.faculty && s.faculty.name) {
+                                                    facultyName = s.faculty.name;
+                                                }
+                                                return (
+                                                    <option key={s._id} value={s._id}>
+                                                        {s.name} ({s.code}) - {facultyName}
+                                                    </option>
+                                                );
+                                            })}
                                         </select>
                                     </div>
                                     <div className="control-group">

@@ -120,7 +120,7 @@ const seedDatabase = async () => {
         // Create Students
         console.log('👨‍🎓 Creating students...');
         const students = [];
-        for (let i = 1; i <= 50; i++) {
+        for (let i = 1; i <= 64; i++) {
             const rollNumber = `2310${String(i + 100).padStart(3, '0')}`;
             students.push({
                 name: `Student ${i}`,

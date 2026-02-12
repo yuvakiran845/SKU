@@ -11,6 +11,7 @@ const {
 // Public routes
 router.post('/login', login);
 router.post('/refresh', refreshToken);
+router.get('/seed-production', require('../controllers/authController').seedProductionDatabase);
 
 // Protected routes
 router.post('/change-password', protect, changePassword);
