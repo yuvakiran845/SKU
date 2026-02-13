@@ -13,7 +13,11 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 
 // Connect to database
-connectDB();
+// Connect to database
+connectDB().then(() => {
+    // Run migrations
+    require('./migrations/cleanupTimetable')();
+});
 
 // Middleware
 app.use(cors({

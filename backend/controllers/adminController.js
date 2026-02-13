@@ -79,18 +79,57 @@ exports.getAllStudents = async (req, res) => {
             ];
         }
 
+        // Get paginated students first
         const students = await User.find(query)
             .select('-password')
             .limit(parseInt(limit))
             .skip((parseInt(page) - 1) * parseInt(limit))
-            .sort({ rollNumber: 1 });
+            .sort({ rollNumber: 1 })
+            .lean(); // Use lean() to get plain JS objects
 
         const total = await User.countDocuments(query);
+
+        // Calculate attendance for these students
+        const studentIds = students.map(s => s._id);
+
+        // Aggregate attendance stats
+        const attendanceStats = await Attendance.aggregate([
+            { $unwind: '$records' },
+            { $match: { 'records.student': { $in: studentIds } } },
+            {
+                $group: {
+                    _id: '$records.student',
+                    present: {
+                        $sum: { $cond: [{ $eq: ['$records.status', 'P'] }, 1, 0] }
+                    },
+                    total: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Map stats to students
+        const statsMap = {};
+        attendanceStats.forEach(stat => {
+            statsMap[stat._id.toString()] = {
+                present: stat.present,
+                total: stat.total,
+                percentage: stat.total > 0 ? Math.round((stat.present / stat.total) * 100) : 0
+            };
+        });
+
+        // Merge stats into student objects
+        const studentsWithStats = students.map(student => {
+            const stats = statsMap[student._id.toString()] || { present: 0, total: 0, percentage: 0 };
+            return {
+                ...student,
+                attendance: stats
+            };
+        });
 
         res.status(200).json({
             success: true,
             data: {
-                students,
+                students: studentsWithStats,
                 total,
                 page: parseInt(page),
                 limit: parseInt(limit),

@@ -22,6 +22,22 @@ const Login = () => {
         if (location.state?.portal) {
             setSelectedRole(location.state.portal);
         }
+
+        // 🚀 Warm-up Ping for Render Free Tier (Cold Start Fix)
+        const warmUpBackend = async () => {
+            try {
+                // Determine backend URL (remove /api if present to hit root)
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+                const rootUrl = apiUrl.replace(/\/api$/, '');
+                await fetch(rootUrl);
+                console.log('Backend warmed up!');
+            } catch (err) {
+                // Ignore errors (it might be CORS blocked on root, or just offline)
+                console.log('Backend warm-up info:', err);
+            }
+        };
+        warmUpBackend();
+
     }, [location.state]);
 
     const handleSubmit = async (e) => {
@@ -197,34 +213,6 @@ const Login = () => {
 
                     <div className="footer-clean">
                         <p>© 2026 SKUCET - Computer Science Department</p>
-                        <button
-                            type="button"
-                            onClick={async () => {
-                                if (window.confirm('This will RESET the database to default state (64 Students, Faculty, Admin). Continue?')) {
-                                    try {
-                                        setLoading(true);
-                                        const res = await authAPI.seedProduction();
-                                        alert(res.data.message);
-                                    } catch (err) {
-                                        alert('Failed to seed database');
-                                        console.error(err);
-                                    } finally {
-                                        setLoading(false);
-                                    }
-                                }
-                            }}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: '#666',
-                                fontSize: '0.7rem',
-                                marginTop: '10px',
-                                cursor: 'pointer',
-                                textDecoration: 'underline'
-                            }}
-                        >
-                            Fix Database / Reset Data
-                        </button>
                     </div>
                 </div>
             </div>

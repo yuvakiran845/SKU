@@ -194,13 +194,15 @@ const AdminDashboard = () => {
     return (
         <div className="admin-layout">
             {/* Mobile Sidebar Toggle */}
-            <button className="mobile-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
+            {!isSidebarOpen && (
+                <button className="mobile-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            )}
 
             {/* Overlay for Mobile */}
             {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
@@ -420,6 +422,7 @@ const AdminDashboard = () => {
                                             <th>Name</th>
                                             <th>Roll Number</th>
                                             <th>Branch</th>
+                                            <th>Attendance</th>
                                             <th>Email</th>
                                         </tr>
                                     </thead>
@@ -434,6 +437,14 @@ const AdminDashboard = () => {
                                                 </td>
                                                 <td>{s.rollNumber}</td>
                                                 <td><span style={{ background: '#e3e8ee', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{s.branch}</span></td>
+                                                <td>
+                                                    <span style={{
+                                                        fontWeight: 'bold',
+                                                        color: (s.attendance?.percentage || 0) < 75 ? '#ef4444' : '#10b981'
+                                                    }}>
+                                                        {s.attendance?.percentage || 0}%
+                                                    </span>
+                                                </td>
                                                 <td>{s.email}</td>
                                             </tr>
                                         ))}
