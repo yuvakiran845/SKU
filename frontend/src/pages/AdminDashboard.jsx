@@ -125,11 +125,8 @@ const AdminDashboard = () => {
                 facultyId: finalFacultyId
             };
 
-            await adminAPI.updateTimetableSlot(payload);
-
-            // Refresh timetable only
-            const res = await adminAPI.getTimetable();
-            setTimetable(res.data.data || res.data);
+            const res = await adminAPI.updateTimetableSlot(payload);
+            setTimetable(res.data.data); // Use updated timetable from response directly
 
             // Refresh dropdown lists if new items were added
             if (selectedSlot.isNewSubject) {

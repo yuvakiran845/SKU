@@ -24,11 +24,8 @@ const FacultyDashboard = () => {
         fetchInitialData();
     }, []);
 
-    useEffect(() => {
-        if (selectedSubject) {
-            fetchStudents(selectedSubject._id);
-        }
-    }, [selectedSubject]);
+    // Removed useEffect for selectedSubject to avoid double fetching / waterfall.
+    // fetchStudents is now called explicitly in fetchInitialData and handleSubjectChange.
 
     const fetchInitialData = async () => {
         setLoading(true);
@@ -42,15 +39,22 @@ const FacultyDashboard = () => {
             const timetableData = timetableRes.data.data || [];
 
             setSubjects(subjectsData);
-            if (subjectsData.length > 0) {
-                // Determine if we should pre-select a subject? 
-                // Given the new "Shared" nature, maybe don't auto-select to force user choice?
-                // But for now let's select first to avoid null errors if any code expects it.
-                // Or better, let it be null and force selection.
-                // Keeping logic:
-                setSelectedSubject(subjectsData[0]);
-            }
             setTimetable(timetableData);
+
+            if (subjectsData.length > 0) {
+                // Optimize: Select first subject AND fetch its students immediately
+                const firstSubject = subjectsData[0];
+                setSelectedSubject(firstSubject);
+
+                // Fetch students here directly to avoid useEffect delay/waterfall
+                const studentsRes = await facultyAPI.getStudentsBySubject(firstSubject._id);
+                const studentsData = studentsRes.data.data || [];
+                setStudents(studentsData);
+
+                const initial = {};
+                studentsData.forEach(s => initial[s._id] = false);
+                setAttendance(initial);
+            }
         } catch (error) {
             console.error("Error fetching data", error);
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
@@ -303,7 +307,13 @@ const FacultyDashboard = () => {
                                         <label>Select Subject</label>
                                         <select
                                             value={selectedSubject?._id || ''}
-                                            onChange={(e) => setSelectedSubject(subjects.find(s => s._id === e.target.value))}
+                                            onChange={(e) => {
+                                                const s = subjects.find(sub => sub._id === e.target.value);
+                                                if (s) {
+                                                    setSelectedSubject(s);
+                                                    fetchStudents(s._id);
+                                                }
+                                            }}
                                             style={{ border: '2px solid black', fontWeight: '500' }}
                                         >
                                             <option value="" disabled>Select a subject</option>
