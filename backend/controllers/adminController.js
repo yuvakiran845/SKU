@@ -420,6 +420,19 @@ exports.createSubject = async (req, res) => {
             });
         }
 
+        // ── Duplicate guard: same name (case-insensitive) in same sem+branch ──
+        const nameExists = await Subject.findOne({
+            name: { $regex: `^${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
+            semester: Number(semester),
+            branch
+        });
+        if (nameExists) {
+            return res.status(400).json({
+                success: false,
+                message: `Subject "${nameExists.name}" (${nameExists.code}) already exists for Sem ${semester} ${branch}. Duplicates are not allowed.`
+            });
+        }
+
         const subject = await Subject.create({
             code,
             name,
@@ -435,9 +448,10 @@ exports.createSubject = async (req, res) => {
         });
     } catch (error) {
         if (error.code === 11000) {
+            const field = error.keyPattern?.code ? 'code' : 'name in this semester/branch';
             return res.status(400).json({
                 success: false,
-                message: 'Subject with this code already exists'
+                message: `A subject with this ${field} already exists. Each subject must be unique.`
             });
         }
 
