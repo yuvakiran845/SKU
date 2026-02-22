@@ -1,0 +1,382 @@
+/* =====================================================
+   FACULTY REGISTER — Same style as Login page
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Page ── */
+.fr-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #f0f9ff 0%, #e0f2fe 40%, #f0fdf4 100%);
+    padding: 32px 16px 48px;
+}
+
+/* ── Card — identical proportions to Login card ── */
+.fr-card {
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    border-radius: 24px;
+    padding: 36px 36px 28px;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        0 12px 40px rgba(14, 165, 233, 0.10),
+        0 40px 80px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    animation: cardIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Back button ── */
+.fr-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    font-family: inherit;
+    padding: 0 0 16px 0;
+    transition: color 180ms;
+    letter-spacing: 0.01em;
+}
+
+.fr-back-btn:hover {
+    color: #0ea5e9;
+}
+
+.fr-back-btn svg {
+    transition: transform 200ms;
+}
+
+.fr-back-btn:hover svg {
+    transform: translateX(-3px);
+}
+
+/* ── Header ── */
+.fr-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.fr-logo-icon {
+    width: 46px;
+    height: 46px;
+    background: linear-gradient(135deg, #f0f9ff, #f0fdf4);
+    border: 2px solid #bae6fd;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.fr-brand {
+    font-size: 24px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin-bottom: 2px;
+}
+
+.fr-brand-sub {
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+/* ── Fields ── */
+.fr-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.fr-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+}
+
+/* ── Inputs — identical to login ── */
+.fr-input {
+    width: 100%;
+    padding: 13px 16px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #0f172a;
+    outline: none;
+    transition: all 200ms;
+    font-family: inherit;
+}
+
+.fr-input::placeholder {
+    color: #94a3b8;
+}
+
+.fr-input:focus {
+    background: white;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.10);
+}
+
+/* Select override */
+.fr-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+/* ── Password wrapper ── */
+.fr-pw-wrap {
+    position: relative;
+}
+
+.fr-pw-wrap .fr-input {
+    padding-right: 46px;
+}
+
+.fr-eye {
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 180ms;
+}
+
+.fr-eye:hover {
+    color: #475569;
+}
+
+/* ── Subject preview pill ── */
+.fr-subject-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #f0f9ff, #f0fdf4);
+    border: 1.5px solid #bae6fd;
+    border-radius: 10px;
+    animation: pillIn 0.2s ease;
+}
+
+@keyframes pillIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fr-subject-code {
+    padding: 3px 9px;
+    background: white;
+    border: 1.5px solid #7dd3fc;
+    border-radius: 7px;
+    font-size: 11.5px;
+    font-weight: 900;
+    color: #0369a1;
+}
+
+.fr-subject-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.fr-subject-meta {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #64748b;
+    margin-left: auto;
+}
+
+/* ── Alerts ── */
+.fr-alert-err {
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    font-size: 13px;
+    font-weight: 600;
+    color: #991b1b;
+}
+
+.fr-alert-info {
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #15803d;
+}
+
+/* ── Skeleton ── */
+.fr-skeleton {
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* ── Form error ── */
+.fr-err {
+    padding: 11px 14px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    font-size: 13px;
+    font-weight: 600;
+    color: #dc2626;
+    text-align: center;
+}
+
+/* ── Submit ── identical to login ── */
+.fr-submit {
+    width: 100%;
+    padding: 15px;
+    margin-top: 4px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    color: white;
+    cursor: pointer;
+    transition: all 240ms;
+    font-family: inherit;
+    box-shadow: 0 5px 18px rgba(14, 165, 233, 0.28);
+}
+
+.fr-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(14, 165, 233, 0.38);
+}
+
+.fr-submit:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.fr-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ── Sign-in link row ── */
+.fr-signin-row {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.fr-signin-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: 700;
+    color: #0ea5e9;
+    font-family: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 180ms;
+    padding: 0;
+}
+
+.fr-signin-link:hover {
+    opacity: 0.7;
+}
+
+/* ── Footer ── */
+.fr-footer {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: #cbd5e1;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* ── Responsive ── */
+@media (max-width: 520px) {
+    .fr-card {
+        padding: 28px 20px;
+        border-radius: 20px;
+    }
+
+    .fr-brand {
+        font-size: 20px;
+    }
+
+    .fr-subject-meta {
+        margin-left: 0;
+    }
+}

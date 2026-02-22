@@ -3,9 +3,11 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 const {
     getProfile,
+    getMySubject,
     getSubjects,
     getStudentsBySubject,
     markAttendance,
+    checkAttendance,
     getAttendanceBySubject,
     enterMarks,
     getMarksBySubject,
@@ -19,10 +21,18 @@ router.use(protect);
 router.use(authorize('faculty'));
 
 router.get('/profile', getProfile);
+
+// My Subject - returns the SINGLE subject this faculty is registered to
+router.get('/my-subject', getMySubject);
+
+// All subjects (legacy / admin use)
 router.get('/subjects', getSubjects);
+
 router.get('/students/:subjectId', getStudentsBySubject);
 
 // Attendance routes
+// IMPORTANT: /check must come BEFORE /:subjectId to avoid route conflict
+router.get('/attendance/check', checkAttendance);
 router.post('/attendance', markAttendance);
 router.get('/attendance/:subjectId', getAttendanceBySubject);
 

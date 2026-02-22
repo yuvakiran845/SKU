@@ -6,7 +6,8 @@ import { mockAPI } from './mockAPI';
 // Set to false when real backend is ready
 const USE_MOCK_API = false;
 
-const API_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:5000/api`;
+// Backend runs on PORT 5000 (set in backend/.env)
+const API_URL = import.meta.env.VITE_API_URL || `http://localhost:5000/api`;
 
 const api = axios.create({
     baseURL: API_URL,
@@ -96,6 +97,14 @@ export const authAPI = {
         USE_MOCK_API
             ? Promise.resolve({ data: { message: 'Mock data reset' } })
             : api.get('/auth/seed-production'),
+
+    // Faculty Registration — no OTP, faculty sets own credentials
+    registerFaculty: (subjectId, email, password) =>
+        api.post('/auth/register-faculty', { subjectId, email, password }),
+
+    // Available subjects for registration dropdown
+    getAvailableSubjects: () =>
+        api.get('/auth/available-subjects'),
 };
 
 // ===========================
@@ -139,6 +148,10 @@ export const facultyAPI = {
             ? mockAPI.getFacultyProfile()
             : api.get('/faculty/profile'),
 
+    // Get the SINGLE subject this faculty is registered to
+    getMySubject: () =>
+        api.get('/faculty/my-subject'),
+
     getSubjects: () =>
         USE_MOCK_API
             ? mockAPI.getFacultySubjects()
@@ -149,10 +162,15 @@ export const facultyAPI = {
             ? mockAPI.getStudentsBySubject(subjectId)
             : api.get(`/faculty/students/${subjectId}`),
 
+    // Smart attendance mark — backend auto-detects create vs update
     markAttendance: (data) =>
         USE_MOCK_API
             ? mockAPI.markAttendance(data)
             : api.post('/faculty/attendance', data),
+
+    // Check if attendance exists for a given date/period/subject
+    checkAttendance: (subjectId, date, period) =>
+        api.get('/faculty/attendance/check', { params: { subjectId, date, period } }),
 
     updateAttendance: (attendanceId, data) =>
         USE_MOCK_API
@@ -314,6 +332,10 @@ export const adminAPI = {
         USE_MOCK_API
             ? Promise.resolve({ data: { message: 'Timetable updated' } })
             : api.put('/admin/timetable/slot', data),
+
+    // New semester — reset ALL attendance records to zero
+    resetAllAttendance: () =>
+        api.delete('/admin/attendance/reset-all'),
 };
 
 export default api;

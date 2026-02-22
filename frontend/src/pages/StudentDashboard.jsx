@@ -240,6 +240,8 @@ const StudentDashboard = () => {
                         <div
                             className="user-info clickable"
                             onClick={() => setShowProfileModal(true)}
+                            title="View profile"
+                            aria-label="Open profile"
                         >
                             <div className="user-avatar">
                                 {profile?.name?.charAt(0).toUpperCase()}
@@ -248,6 +250,9 @@ const StudentDashboard = () => {
                                 <p className="user-name">{profile?.name}</p>
                                 <p className="user-role">{profile?.rollNumber}</p>
                             </div>
+                            <svg className="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
                         </div>
                         <button onClick={handleLogout} className="btn-logout">
                             Logout

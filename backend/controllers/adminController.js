@@ -340,7 +340,7 @@ exports.getAllFaculty = async (req, res) => {
     }
 };
 
-// @desc    Delete faculty
+// @desc    Delete faculty (also unlinks their registered subject so it can be re-registered)
 // @route   DELETE /api/admin/faculty/:id
 // @access  Private (Admin)
 exports.deleteFaculty = async (req, res) => {
@@ -354,11 +354,23 @@ exports.deleteFaculty = async (req, res) => {
             });
         }
 
+        // Unlink their registered subject so it becomes available for new-semester registration
+        if (faculty.registeredSubject) {
+            await Subject.findByIdAndUpdate(faculty.registeredSubject, { faculty: null });
+        }
+        // Also clear any subjects array links
+        if (faculty.subjects?.length) {
+            await Subject.updateMany(
+                { _id: { $in: faculty.subjects } },
+                { $unset: { faculty: '' } }
+            );
+        }
+
         await faculty.deleteOne();
 
         res.status(200).json({
             success: true,
-            message: 'Faculty deleted successfully'
+            message: 'Faculty removed successfully. Their subject is now available for new registration.'
         });
     } catch (error) {
         res.status(500).json({
@@ -368,6 +380,28 @@ exports.deleteFaculty = async (req, res) => {
         });
     }
 };
+
+// @desc    Reset all student attendance to zero (for new semester)
+// @route   DELETE /api/admin/attendance/reset-all
+// @access  Private (Admin)
+exports.resetAllAttendance = async (req, res) => {
+    try {
+        const result = await Attendance.deleteMany({});
+        res.status(200).json({
+            success: true,
+            message: `All attendance records cleared. ${result.deletedCount} records removed.`,
+            data: { deletedCount: result.deletedCount }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+};
+
+
 
 // ==================== SUBJECT MANAGEMENT ====================
 

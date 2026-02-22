@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import ChangePassword from './pages/ChangePassword';
 import StudentDashboard from './pages/StudentDashboard';
 import FacultyDashboard from './pages/FacultyDashboard';
+import FacultyRegister from './pages/FacultyRegister';
 import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
 
@@ -87,6 +88,16 @@ function App() {
             element={
               <PublicRoute>
                 <Login />
+              </PublicRoute>
+            }
+          />
+
+          {/* Faculty Registration — public, one-time */}
+          <Route
+            path="/faculty/register"
+            element={
+              <PublicRoute>
+                <FacultyRegister />
               </PublicRoute>
             }
           />

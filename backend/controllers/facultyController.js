@@ -27,6 +27,42 @@ exports.getProfile = async (req, res) => {
     }
 };
 
+// @desc    Get the ONE subject assigned to THIS faculty (their registered subject)
+// @route   GET /api/faculty/my-subject
+// @access  Private (Faculty)
+exports.getMySubject = async (req, res) => {
+    try {
+        const faculty = await User.findById(req.user._id)
+            .populate('registeredSubject', 'code name credits semester branch');
+
+        if (!faculty) {
+            return res.status(404).json({
+                success: false,
+                message: 'Faculty not found'
+            });
+        }
+
+        // Return the single registered subject
+        if (!faculty.registeredSubject) {
+            return res.status(404).json({
+                success: false,
+                message: 'No subject registered to this faculty account.'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: faculty.registeredSubject
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+};
+
 // @desc    Get subjects taught by faculty
 // @route   GET /api/faculty/subjects
 // @access  Private (Faculty)
@@ -94,7 +130,7 @@ exports.getStudentsBySubject = async (req, res) => {
     }
 };
 
-// @desc    Mark attendance
+// @desc    Mark / Update attendance (UPSERT: create if not exists, update if exists)
 // @route   POST /api/faculty/attendance
 // @access  Private (Faculty)
 exports.markAttendance = async (req, res) => {
@@ -109,7 +145,7 @@ exports.markAttendance = async (req, res) => {
             });
         }
 
-        // Verify faculty teaches this subject
+        // Verify subject exists
         const subject = await Subject.findById(subjectId);
 
         if (!subject) {
@@ -119,47 +155,90 @@ exports.markAttendance = async (req, res) => {
             });
         }
 
-        // Shared portal: Removed strict faculty check
-        // if (subject.faculty.toString() !== req.user._id.toString()) { ... }
+        // Normalize date to start of day (strip time component) to avoid midnight offset issues
+        const attendanceDate = new Date(date);
+        attendanceDate.setUTCHours(0, 0, 0, 0);
 
-        // Check if attendance already exists for this date and period
+        // SMART UPSERT: Check if attendance already exists for this date + period + subject
         const existingAttendance = await Attendance.findOne({
             subject: subjectId,
-            date: new Date(date),
+            date: attendanceDate,
             period
         });
 
+        let attendance;
+        let isUpdate = false;
+
         if (existingAttendance) {
-            return res.status(400).json({
-                success: false,
-                message: 'Attendance already marked for this date and period'
+            // UPDATE MODE: Modify existing attendance record
+            existingAttendance.records = records;
+            existingAttendance.faculty = req.user._id; // update who last modified
+            await existingAttendance.save();
+            attendance = existingAttendance;
+            isUpdate = true;
+            console.log(`✏️ Attendance UPDATED for ${subject.code} | ${date} | Period ${period}`);
+        } else {
+            // CREATE MODE: New attendance record
+            attendance = await Attendance.create({
+                subject: subjectId,
+                faculty: req.user._id,
+                date: attendanceDate,
+                period,
+                semester: subject.semester,
+                branch: subject.branch,
+                records
             });
+            console.log(`✅ Attendance CREATED for ${subject.code} | ${date} | Period ${period}`);
         }
 
-        // Create attendance record
-        const attendance = await Attendance.create({
-            subject: subjectId,
-            faculty: req.user._id,
-            date: new Date(date),
-            period,
-            semester: subject.semester,
-            branch: subject.branch,
-            records
-        });
-
-        res.status(201).json({
+        res.status(isUpdate ? 200 : 201).json({
             success: true,
-            message: 'Attendance marked successfully',
+            message: isUpdate
+                ? 'Attendance updated successfully'
+                : 'Attendance marked successfully',
+            mode: isUpdate ? 'update' : 'create',
             data: attendance
         });
     } catch (error) {
-        if (error.code === 11000) {
+        console.error('Attendance error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Check if attendance exists for a date/period/subject
+// @route   GET /api/faculty/attendance/check
+// @access  Private (Faculty)
+exports.checkAttendance = async (req, res) => {
+    try {
+        const { subjectId, date, period } = req.query;
+
+        if (!subjectId || !date || !period) {
             return res.status(400).json({
                 success: false,
-                message: 'Attendance already exists for this date and period'
+                message: 'subjectId, date, and period are required'
             });
         }
 
+        const attendanceDate = new Date(date);
+        attendanceDate.setUTCHours(0, 0, 0, 0);
+
+        const existing = await Attendance.findOne({
+            subject: subjectId,
+            date: attendanceDate,
+            period: Number(period)
+        }).populate('records.student', 'name rollNumber');
+
+        res.status(200).json({
+            success: true,
+            exists: !!existing,
+            mode: existing ? 'update' : 'create',
+            data: existing || null
+        });
+    } catch (error) {
         res.status(500).json({
             success: false,
             message: 'Server error',

@@ -5,13 +5,21 @@ const {
     login,
     refreshToken,
     changePassword,
-    getMe
+    getMe,
+    simpleFacultyRegister,
+    getAvailableSubjects,
 } = require('../controllers/authController');
 
 // Public routes
 router.post('/login', login);
 router.post('/refresh', refreshToken);
 router.get('/seed-production', require('../controllers/authController').seedProductionDatabase);
+
+// Faculty Registration — no OTP, faculty sets own email + password
+router.post('/register-faculty', simpleFacultyRegister);
+
+// Available subjects for registration dropdown
+router.get('/available-subjects', getAvailableSubjects);
 
 // Protected routes
 router.post('/change-password', protect, changePassword);

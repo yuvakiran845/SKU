@@ -58,6 +58,21 @@ const userSchema = new mongoose.Schema({
         trim: true
     },
 
+    // The ONE subject this faculty is registered to (unique constraint: 1 faculty per subject)
+    registeredSubject: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subject',
+        sparse: true,
+        unique: true
+    },
+
+    // The original registration email (for audit/display)
+    registrationEmail: {
+        type: String,
+        lowercase: true,
+        trim: true
+    },
+
     subjects: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subject'

@@ -4,6 +4,130 @@ const Subject = require('../models/Subject');
 const Timetable = require('../models/Timetable');
 const Announcement = require('../models/Announcement');
 
+// =============================================================
+// SIMPLE FACULTY REGISTRATION (No OTP — faculty sets own credentials)
+// =============================================================
+// @desc    Register faculty with subject, email, and password
+// @route   POST /api/auth/register-faculty
+// @access  Public
+exports.simpleFacultyRegister = async (req, res) => {
+    try {
+        const { subjectId, email, password, name } = req.body;
+
+        if (!subjectId || !email || !password) {
+            return res.status(400).json({ success: false, message: 'Subject, email, and password are required.' });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
+        }
+
+        // Verify subject exists
+        const subject = await Subject.findById(subjectId);
+        if (!subject || !subject.isActive) {
+            return res.status(404).json({ success: false, message: 'Subject not found or inactive.' });
+        }
+
+        // Check subject not already taken
+        const subjectTaken = await User.findOne({ role: 'faculty', registeredSubject: subjectId });
+        if (subjectTaken) {
+            return res.status(409).json({
+                success: false,
+                message: `A faculty is already registered for "${subject.name}". Please sign in instead.`
+            });
+        }
+
+        // Check email not already used
+        const emailTaken = await User.findOne({ email: email.toLowerCase() });
+        if (emailTaken) {
+            return res.status(409).json({ success: false, message: 'This email is already in use. Try a different email.' });
+        }
+
+        const facultyName = name?.trim() || `Faculty - ${subject.name}`;
+        const employeeId = `FAC-${subject.code.replace(/[^A-Z0-9]/gi, '').toUpperCase()}-${Date.now().toString().slice(-4)}`;
+
+        const faculty = await User.create({
+            name: facultyName,
+            email: email.toLowerCase(),
+            password,
+            role: 'faculty',
+            registeredSubject: subjectId,
+            subjects: [subjectId],
+            employeeId,
+            isActive: true
+        });
+
+        // Link subject to faculty
+        await Subject.findByIdAndUpdate(subjectId, { faculty: faculty._id });
+
+        console.log(`✅ Faculty registered: ${subject.name} (${subject.code}) | Email: ${email}`);
+
+        res.status(201).json({
+            success: true,
+            message: `Registration successful! Welcome, Faculty of ${subject.name}.`,
+            data: {
+                subjectName: subject.name,
+                subjectCode: subject.code,
+                loginEmail: email.toLowerCase()
+            }
+        });
+
+    } catch (error) {
+        console.error('Faculty register error:', error);
+        if (error.code === 11000) {
+            return res.status(409).json({ success: false, message: 'Email or subject already registered.' });
+        }
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// Keep legacy alias
+exports.registerFaculty = exports.simpleFacultyRegister;
+exports.sendFacultyOTP = exports.simpleFacultyRegister;   // fallback so old routes don't 500
+exports.verifyFacultyOTP = exports.simpleFacultyRegister; // fallback
+
+
+
+
+
+// @desc    Get all subjects available for registration (not yet registered)
+// @route   GET /api/auth/available-subjects
+// @access  Public
+exports.getAvailableSubjects = async (req, res) => {
+    try {
+        // Return subjects that have NO registered faculty via registeredSubject field
+        // A subject is available if no faculty has it as their registeredSubject
+        const registeredSubjectIds = await User.distinct('registeredSubject', {
+            role: 'faculty',
+            registeredSubject: { $exists: true, $ne: null }
+        });
+
+        const allSubjects = await Subject.find({ isActive: true }).sort({ code: 1 });
+
+        const availableSubjects = allSubjects.filter(sub =>
+            !registeredSubjectIds.some(rid => rid && rid.toString() === sub._id.toString())
+        );
+
+        const registeredSubjects = allSubjects.filter(sub =>
+            registeredSubjectIds.some(rid => rid && rid.toString() === sub._id.toString())
+        );
+
+        res.status(200).json({
+            success: true,
+            data: {
+                available: availableSubjects,
+                registered: registeredSubjects
+            }
+        });
+    } catch (error) {
+        console.error('Get available subjects error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+};
+
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public

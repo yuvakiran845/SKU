@@ -16,7 +16,8 @@ const {
     getSystemStats,
     bulkCreateStudents,
     getTimetable,
-    updateTimetableSlot
+    updateTimetableSlot,
+    resetAllAttendance,
 } = require('../controllers/adminController');
 
 // All routes are protected and only for admins
@@ -47,5 +48,8 @@ router.get('/stats', getSystemStats);
 // Timetable routes
 router.get('/timetable', getTimetable);
 router.put('/timetable/slot', updateTimetableSlot);
+
+// Attendance reset (new semester)
+router.delete('/attendance/reset-all', resetAllAttendance);
 
 module.exports = router;
