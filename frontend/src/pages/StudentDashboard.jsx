@@ -238,21 +238,15 @@ const StudentDashboard = () => {
 
                     <div className="navbar-actions">
                         <div
-                            className="user-info clickable"
+                            className="nav-profile"
                             onClick={() => setShowProfileModal(true)}
-                            title="View profile"
+                            title="Click to view full profile"
                             aria-label="Open profile"
                         >
-                            <div className="user-avatar">
+                            <span className="nav-avatar">
                                 {profile?.name?.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="user-details">
-                                <p className="user-name">{profile?.name}</p>
-                                <p className="user-role">{profile?.rollNumber}</p>
-                            </div>
-                            <svg className="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="6 9 12 15 18 9" />
-                            </svg>
+                            </span>
+                            <span className="nav-student-name">{profile?.name}</span>
                         </div>
                         <button onClick={handleLogout} className="btn-logout">
                             Logout
