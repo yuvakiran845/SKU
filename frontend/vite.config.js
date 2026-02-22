@@ -6,5 +6,15 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true
+  },
+  build: {
+    outDir: 'dist',
+    // Ensure assets are embedded correctly for SPA routing
+    chunkSizeWarningLimit: 1000,
+  },
+  // Enable SPA fallback for vite preview (local production testing)
+  preview: {
+    host: true,
+    port: 4173,
   }
 })
