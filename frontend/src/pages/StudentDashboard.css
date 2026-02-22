@@ -800,49 +800,80 @@ body {
 
     /* Navbar */
     .dashboard-navbar-premium {
-        height: 62px;
-        padding: 0 14px;
+        height: auto;
+        min-height: 60px;
+        padding: 8px 12px;
+    }
+
+    .navbar-content {
+        gap: 8px;
+        align-items: center;
+    }
+
+    .navbar-brand {
+        gap: 8px;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    .brand-logo-svg {
+        width: 28px;
+        height: 28px;
     }
 
     .navbar-brand h2 {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .navbar-brand p {
         display: none;
     }
 
-    /* On mobile: hide the text inside clickable pill, show only avatar */
-    .user-info.clickable {
-        max-width: none;
-        padding: 4px;
-        border-radius: 50%;
-        border-color: transparent;
-        background: transparent;
+    /* Right-side cluster: avatar+name stacked, then logout */
+    .navbar-actions {
+        gap: 8px;
+        flex-shrink: 0;
+        align-items: center;
     }
 
-    .user-info.clickable:hover {
-        background: rgba(99, 91, 255, .08);
-        border-color: rgba(99, 91, 255, .2);
+    /* Stack avatar on top, student name below */
+    .nav-profile {
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
     }
 
-    .user-details {
-        display: none;
+    /* Slightly smaller avatar circle */
+    .nav-avatar {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 14px;
     }
 
-    .user-avatar {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        font-size: 13px;
+    /* Student name: small, clipped, below avatar */
+    .nav-student-name {
+        font-size: 9px;
+        font-weight: 700;
+        max-width: 68px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+        line-height: 1.2;
+        color: var(--text-dark);
     }
 
+    /* Logout button — compact but fully visible */
     .btn-logout {
-        padding: 6px 12px;
-        font-size: 12px;
+        padding: 6px 10px;
+        font-size: 11px;
+        flex-shrink: 0;
+        white-space: nowrap;
     }
 
-    /* hide chevron on mobile — pill collapses to just avatar */
+    /* hide chevron on mobile */
     .nav-chevron {
         display: none;
     }
