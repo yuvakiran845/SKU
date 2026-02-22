@@ -115,63 +115,71 @@ body {
     min-width: 0;
 }
 
-/* ── Profile Pill (the clickable user card) ── */
+/* ── Profile Card (flat — no round pill that clips avatar) ── */
 .user-info,
 .user-info.clickable {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
+    flex-shrink: 0;
 }
 
 .user-info.clickable {
     cursor: pointer;
-    padding: 5px 12px 5px 5px;
-    border-radius: 99px;
+    padding: 6px 14px 6px 6px;
+    /* Gentle rounded rectangle — NOT a pill, so avatar never clips */
+    border-radius: 12px;
     border: 1.5px solid var(--border-light);
     background: #f8faff;
     transition: border-color .2s, box-shadow .2s, background .2s;
-    max-width: 240px;
+    /* No max-width that might squeeze the avatar */
     align-self: center;
-    /* keeps it perfectly centred in 70px navbar */
     box-sizing: border-box;
+    overflow: visible;
+    /* never clip children */
 }
 
 .user-info.clickable:hover {
-    border-color: rgba(99, 91, 255, .4);
+    border-color: rgba(99, 91, 255, .5);
     background: #f0eeff;
-    box-shadow: 0 2px 10px rgba(99, 91, 255, .14);
+    box-shadow: 0 2px 12px rgba(99, 91, 255, .18);
 }
 
-/* ── Avatar Circle ── */
+/* ── Avatar Circle — guaranteed fully visible ── */
 .user-avatar {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    max-width: 36px;
+    /* Fixed square — never let flex shrink it */
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    flex-shrink: 0;
+    /* No max-width — allows the circle to breathe */
     background: linear-gradient(135deg, #635bff 0%, #4b45c2 100%);
     border-radius: 50%;
+    /* Centre the letter perfectly */
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 800;
-    font-size: 14px;
-    letter-spacing: 0;
-    flex-shrink: 0;
-    /* No box-shadow clip needed — overflow:hidden was removed from parent */
-    box-shadow: 0 0 0 2px rgba(99, 91, 255, .18);
+    font-size: 17px;
+    /* bigger so K/A/M are clearly legible */
     line-height: 1;
+    letter-spacing: 0;
+    /* A solid border ring instead of box-shadow (no clipping risk) */
+    border: 2.5px solid rgba(99, 91, 255, .25);
+    overflow: visible;
 }
 
-/* ── Name / Roll in pill ── */
+/* ── Name / Roll ── */
 .user-details {
     min-width: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1px;
+    gap: 2px;
 }
 
 .user-details p {
@@ -180,16 +188,19 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 180px;
+    /* enough for full name without truncating short ones */
 }
 
 .user-name {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-dark);
+    letter-spacing: -0.1px;
 }
 
 .user-role {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-gray);
     font-weight: 500;
 }
