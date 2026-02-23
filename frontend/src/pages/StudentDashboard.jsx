@@ -7,6 +7,7 @@ import './StudentDashboard.css';
 const StudentDashboard = () => {
     const [profile, setProfile] = useState(null);
     const [attendance, setAttendance] = useState([]);
+    const [attendanceMeta, setAttendanceMeta] = useState({ month: '', year: '' });
     const [timetable, setTimetable] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
@@ -28,12 +29,12 @@ const StudentDashboard = () => {
                     studentAPI.getTimetable(),
                 ]);
 
-            setProfile(profileRes.data.data || profileRes.data); // Handle both if needed, but data.data is consistent with new backend logic
-            setAttendance(attendanceRes.data.data || attendanceRes.data); // Attendance controller might still return direct data, let's keep it safe
-
-            // Timetable controller returns slots array directly in .data or .data.data? 
-            // Faculty controller returned { success: true, data: [...] }. 
-            // Student controller likely similar.
+            setProfile(profileRes.data.data || profileRes.data);
+            setAttendance(attendanceRes.data.data || []);
+            // Store the month/year meta returned by the backend
+            if (attendanceRes.data.meta) {
+                setAttendanceMeta(attendanceRes.data.meta);
+            }
             setTimetable(timetableRes.data.data || timetableRes.data || []);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -69,11 +70,16 @@ const StudentDashboard = () => {
         return ((totalPresent / totalClasses) * 100).toFixed(2);
     };
 
+    // Returns the weighted monthly attendance % across ALL subjects for the current month
     const calculateMonthlyAttendance = () => {
-        // Mock logic: Returns 0 as requested "month wise attendance will become zero when month changes"
-        // In a real app, we'd filter attendance logs by current month.
-        // For now, we return 0 to simulate the "new month" state or separate box behavior.
-        return 0;
+        if (!attendance || attendance.length === 0) return 0;
+        const validSubs = attendance.filter(
+            s => s.subjectName !== 'Library' && s.subjectCode !== 'LIB'
+        );
+        const totalPresent = validSubs.reduce((sum, s) => sum + (Number(s.monthPresent) || 0), 0);
+        const totalClasses = validSubs.reduce((sum, s) => sum + (Number(s.monthTotal) || 0), 0);
+        if (totalClasses === 0) return 0;
+        return ((totalPresent / totalClasses) * 100).toFixed(2);
     };
 
     // Helper to get full subject name from short codes if necessary
@@ -352,7 +358,7 @@ const StudentDashboard = () => {
                                     <div className="card-data">
                                         <h3>Month-wise Attendance</h3>
                                         <div className="big-number">{calculateMonthlyAttendance()}%</div>
-                                        <p>(Resets Monthly - Current: {new Date().toLocaleString('default', { month: 'long' })})</p>
+                                        <p>(Resets Monthly — {attendanceMeta.month || new Date().toLocaleString('default', { month: 'long' })} {attendanceMeta.year || new Date().getFullYear()})</p>
                                     </div>
                                 </div>
 
@@ -410,17 +416,20 @@ const StudentDashboard = () => {
                     {activeTab === 'attendance' && (
                         <div className="attendance-section fade-in">
                             <div className="section-header-premium">
-                                <h3>Total Attendance Records</h3>
+                                <h3>Attendance Records</h3>
                                 <p>Monthly Attendance resets automatically on the 1st of every month.</p>
                             </div>
                             <div className="attendance-header-summary" style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
                                 <div className="summary-box" style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', flex: 1, border: '1px solid #e3e8ee' }}>
-                                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#525f7f' }}>Total Yearly (Cumulative)</h4>
+                                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#525f7f' }}>Overall Semester (Cumulative)</h4>
                                     <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#32325d' }}>{calculateOverallAttendance()}%</div>
                                 </div>
                                 <div className="summary-box" style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', flex: 1, border: '1px solid #e3e8ee' }}>
-                                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#525f7f' }}>Month-wise ({new Date().toLocaleString('default', { month: 'short' })})</h4>
-                                    <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#00d4ff' }}>{calculateMonthlyAttendance()}%</div>
+                                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#525f7f' }}>
+                                        This Month — {attendanceMeta.month || new Date().toLocaleString('default', { month: 'long' })}
+                                    </h4>
+                                    <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#0EA5E9' }}>{calculateMonthlyAttendance()}%</div>
+                                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>Resets on 1st of every month</p>
                                 </div>
                             </div>
                             <div className="section-header-premium">
@@ -428,38 +437,64 @@ const StudentDashboard = () => {
                                 <p>Minimum 75% required</p>
                             </div>
                             <div className="attendance-grid-premium">
-                                {attendance.map((subject, index) => (
-                                    <div key={index} className={`subject-card ${getAttendanceStatus(subject.percentage)}`}>
-                                        <div className="subject-header">
-                                            <h4>{getFullSubjectName(subject.subjectName)}</h4>
-                                        </div>
+                                {attendance
+                                    .filter(sub => sub.subjectName !== 'Library' && sub.subjectCode !== 'LIB')
+                                    .map((subject, index) => (
+                                        <div key={index} className={`subject-card ${getAttendanceStatus(subject.percentage)}`}>
+                                            <div className="subject-header">
+                                                <h4>{subject.subjectCode} — {subject.subjectName}</h4>
+                                            </div>
 
-                                        <div className="progress-track-container">
-                                            <div className="progress-track">
-                                                <div
-                                                    className="progress-fill"
-                                                    style={{ width: `${subject.percentage}%` }}
-                                                ></div>
+                                            {/* Overall progress bar */}
+                                            <div style={{ marginBottom: '0.5rem' }}>
+                                                <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>OVERALL</span>
                                             </div>
-                                            <span className="percentage-text">{subject.percentage}%</span>
-                                        </div>
+                                            <div className="progress-track-container">
+                                                <div className="progress-track">
+                                                    <div
+                                                        className="progress-fill"
+                                                        style={{ width: `${Math.min(subject.percentage, 100)}%` }}
+                                                    ></div>
+                                                </div>
+                                                <span className="percentage-text">{subject.percentage}%</span>
+                                            </div>
 
-                                        <div className="subject-stats">
-                                            <div className="stat-pill present">
-                                                <span className="label">Present</span>
-                                                <span className="value">{subject.present}</span>
+                                            {/* Monthly progress bar */}
+                                            <div style={{ marginTop: '0.75rem', marginBottom: '0.25rem' }}>
+                                                <span style={{ fontSize: '0.72rem', color: '#0EA5E9', fontWeight: 600, letterSpacing: '0.04em' }}>
+                                                    {attendanceMeta.month ? attendanceMeta.month.toUpperCase() : 'THIS MONTH'}
+                                                </span>
                                             </div>
-                                            <div className="stat-pill absent">
-                                                <span className="label">Absent</span>
-                                                <span className="value">{subject.absent}</span>
+                                            <div className="progress-track-container">
+                                                <div className="progress-track" style={{ background: '#e0f2fe' }}>
+                                                    <div
+                                                        className="progress-fill"
+                                                        style={{ width: `${Math.min(subject.monthPercentage || 0, 100)}%`, background: 'linear-gradient(90deg,#0EA5E9,#38bdf8)' }}
+                                                    ></div>
+                                                </div>
+                                                <span className="percentage-text" style={{ color: '#0EA5E9' }}>{subject.monthPercentage || 0}%</span>
                                             </div>
-                                            <div className="stat-pill total">
-                                                <span className="label">Total</span>
-                                                <span className="value">{subject.total}</span>
+
+                                            <div className="subject-stats">
+                                                <div className="stat-pill present">
+                                                    <span className="label">Present</span>
+                                                    <span className="value">{subject.present}</span>
+                                                </div>
+                                                <div className="stat-pill absent">
+                                                    <span className="label">Absent</span>
+                                                    <span className="value">{subject.absent}</span>
+                                                </div>
+                                                <div className="stat-pill total">
+                                                    <span className="label">Total</span>
+                                                    <span className="value">{subject.total}</span>
+                                                </div>
+                                                <div className="stat-pill" style={{ background: '#e0f2fe', borderColor: '#bae6fd' }}>
+                                                    <span className="label" style={{ color: '#0369a1' }}>This Month</span>
+                                                    <span className="value" style={{ color: '#0EA5E9' }}>{subject.monthPresent || 0}/{subject.monthTotal || 0}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         </div>
                     )}
