@@ -9,6 +9,7 @@ const {
     markAttendance,
     checkAttendance,
     getAttendanceBySubject,
+    getAttendanceCount,
     enterMarks,
     getMarksBySubject,
     postAnnouncement,
@@ -31,8 +32,9 @@ router.get('/subjects', getSubjects);
 router.get('/students/:subjectId', getStudentsBySubject);
 
 // Attendance routes
-// IMPORTANT: /check must come BEFORE /:subjectId to avoid route conflict
+// IMPORTANT: /check and /count must come BEFORE /:subjectId to avoid route conflict
 router.get('/attendance/check', checkAttendance);
+router.get('/attendance/count/:subjectId', getAttendanceCount);
 router.post('/attendance', markAttendance);
 router.get('/attendance/:subjectId', getAttendanceBySubject);
 

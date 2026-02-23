@@ -149,9 +149,8 @@ const FacultyDashboard = () => {
     // =========================================================
     const fetchAttendanceSummary = async (subjectId) => {
         try {
-            const res = await facultyAPI.getAttendanceBySubject(subjectId);
-            const records = res.data.data || [];
-            setTotalClassesConducted(records.length);
+            const res = await facultyAPI.getAttendanceCount(subjectId);
+            setTotalClassesConducted(res.data.count || 0);
         } catch (err) {
             console.error('Attendance summary error:', err);
         }

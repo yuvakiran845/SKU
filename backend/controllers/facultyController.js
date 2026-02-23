@@ -265,12 +265,8 @@ exports.getAttendanceBySubject = async (req, res) => {
             });
         }
 
-        if (subject.faculty.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: 'Not authorized'
-            });
-        }
+        // Shared portal: Removed strict faculty ownership check
+        // (other faculty endpoints like getStudentsBySubject already follow this pattern)
 
         const query = { subject: subjectId };
         if (date) {
@@ -284,6 +280,37 @@ exports.getAttendanceBySubject = async (req, res) => {
         res.status(200).json({
             success: true,
             data: attendance
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get the COUNT of distinct attendance sessions (classes conducted) for a subject
+// @route   GET /api/faculty/attendance/count/:subjectId
+// @access  Private (Faculty)
+exports.getAttendanceCount = async (req, res) => {
+    try {
+        const { subjectId } = req.params;
+
+        const subject = await Subject.findById(subjectId);
+        if (!subject) {
+            return res.status(404).json({
+                success: false,
+                message: 'Subject not found'
+            });
+        }
+
+        // Count distinct attendance sessions (each document = one class session)
+        const count = await Attendance.countDocuments({ subject: subjectId });
+
+        res.status(200).json({
+            success: true,
+            count
         });
     } catch (error) {
         res.status(500).json({

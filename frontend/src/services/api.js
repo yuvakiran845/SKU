@@ -182,6 +182,10 @@ export const facultyAPI = {
             ? mockAPI.getStudentsBySubject(subjectId)
             : api.get(`/faculty/attendance/${subjectId}`, { params: { date } }),
 
+    // Returns just the count of classes conducted for a subject (no ownership restriction)
+    getAttendanceCount: (subjectId) =>
+        api.get(`/faculty/attendance/count/${subjectId}`),
+
     enterMarks: (data) =>
         USE_MOCK_API
             ? mockAPI.enterMarks(data)
