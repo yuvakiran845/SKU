@@ -8,12 +8,18 @@ const {
     getMe,
     simpleFacultyRegister,
     getAvailableSubjects,
+    verifyLoginOTP,
+    resendLoginOTP,
 } = require('../controllers/authController');
 
 // Public routes
 router.post('/login', login);
 router.post('/refresh', refreshToken);
 router.get('/seed-production', require('../controllers/authController').seedProductionDatabase);
+
+// ✅ Login OTP verification (Faculty & Admin)
+router.post('/verify-login-otp', verifyLoginOTP);
+router.post('/resend-login-otp', resendLoginOTP);
 
 // Faculty Registration — no OTP, faculty sets own email + password
 router.post('/register-faculty', simpleFacultyRegister);

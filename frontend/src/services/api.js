@@ -78,10 +78,19 @@ api.interceptors.response.use(
 // ===========================
 
 export const authAPI = {
-    login: (email, password) =>
+    // ✅ Role is now required — backend enforces role-based access
+    login: (email, password, role) =>
         USE_MOCK_API
             ? mockAPI.login(email, password)
-            : api.post('/auth/login', { email, password }),
+            : api.post('/auth/login', { email, password, role }),
+
+    // ✅ Step 2 for Faculty/Admin: verify the OTP received by email
+    verifyLoginOTP: (email, otp) =>
+        api.post('/auth/verify-login-otp', { email, otp }),
+
+    // Resend OTP if it expired or wasn't received
+    resendLoginOTP: (email, role) =>
+        api.post('/auth/resend-login-otp', { email, role }),
 
     changePassword: (currentPassword, newPassword) =>
         USE_MOCK_API

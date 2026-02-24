@@ -3,6 +3,28 @@ const { generateTokens, verifyRefreshToken } = require('../middleware/auth');
 const Subject = require('../models/Subject');
 const Timetable = require('../models/Timetable');
 const Announcement = require('../models/Announcement');
+const { sendLoginVerificationOTP } = require('../utils/emailService');
+
+// =====================================================================
+// IN-MEMORY OTP STORE (per email, expires in 10 minutes)
+// Format: { [email]: { otp, expiresAt, userId, role } }
+// =====================================================================
+const loginOTPStore = {};
+
+// Generate a cryptographically random 6-digit OTP
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Clean up expired OTPs periodically (every 5 minutes)
+setInterval(() => {
+    const now = Date.now();
+    for (const email in loginOTPStore) {
+        if (loginOTPStore[email].expiresAt < now) {
+            delete loginOTPStore[email];
+        }
+    }
+}, 5 * 60 * 1000);
 
 // =============================================================
 // SIMPLE FACULTY REGISTRATION (No OTP — faculty sets own credentials)
@@ -86,16 +108,11 @@ exports.sendFacultyOTP = exports.simpleFacultyRegister;   // fallback so old rou
 exports.verifyFacultyOTP = exports.simpleFacultyRegister; // fallback
 
 
-
-
-
 // @desc    Get all subjects available for registration (not yet registered)
 // @route   GET /api/auth/available-subjects
 // @access  Public
 exports.getAvailableSubjects = async (req, res) => {
     try {
-        // Return subjects that have NO registered faculty via registeredSubject field
-        // A subject is available if no faculty has it as their registeredSubject
         const registeredSubjectIds = await User.distinct('registeredSubject', {
             role: 'faculty',
             registeredSubject: { $exists: true, $ne: null }
@@ -128,12 +145,15 @@ exports.getAvailableSubjects = async (req, res) => {
     }
 };
 
-// @desc    Login user
+// =============================================================
+// ROLE-BASED LOGIN
+// @desc    Login user — validates credentials AND role match
 // @route   POST /api/auth/login
 // @access  Public
+// =============================================================
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
 
         // Validate input
         if (!email || !password) {
@@ -143,13 +163,28 @@ exports.login = async (req, res) => {
             });
         }
 
+        if (!role || !['student', 'faculty', 'admin'].includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please select a valid portal (student, faculty, or admin)'
+            });
+        }
+
         // Find user and include password
-        const user = await User.findOne({ email }).select('+password');
+        const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
         if (!user) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
+            });
+        }
+
+        // ✅ ROLE-BASED ENFORCEMENT: Reject if roles don't match
+        if (user.role !== role) {
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied.'
             });
         }
 
@@ -171,23 +206,195 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Generate tokens
-        const { accessToken, refreshToken } = generateTokens(user);
+        // ✅ STUDENTS → Direct login (no OTP required)
+        if (role === 'student') {
+            const { accessToken, refreshToken } = generateTokens(user);
+            const userData = user.toPublicJSON();
 
-        // Return user data without password
-        const userData = user.toPublicJSON();
+            return res.status(200).json({
+                success: true,
+                accessToken,
+                refreshToken,
+                user: userData
+            });
+        }
 
-        res.status(200).json({
+        // ✅ FACULTY & ADMIN → Require OTP email verification
+        // Generate OTP
+        const otp = generateOTP();
+        const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+        // Store OTP in memory
+        loginOTPStore[user.email] = {
+            otp,
+            expiresAt,
+            userId: user._id.toString(),
+            role: user.role
+        };
+
+        console.log(`🔐 Login OTP generated for ${role} [${user.email}]: ${otp}`);
+
+        // Send OTP via email
+        try {
+            await sendLoginVerificationOTP(user.email, otp, role, user.name);
+        } catch (emailError) {
+            console.error('Email send failed:', emailError.message);
+            // Remove OTP from store if email failed
+            delete loginOTPStore[user.email];
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to send verification email. Please check that the email service is configured correctly and try again.',
+                error: emailError.message
+            });
+        }
+
+        // Respond with OTP-required signal (do NOT send token yet)
+        return res.status(200).json({
             success: true,
-            accessToken,
-            refreshToken,
-            user: userData
+            requiresOTP: true,
+            email: user.email,
+            message: `A 6-digit verification code has been sent to ${user.email}. Please check your inbox.`
         });
+
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error during login',
+            error: error.message
+        });
+    }
+};
+
+// =============================================================
+// VERIFY LOGIN OTP (Faculty & Admin only)
+// @desc    Verify the OTP sent to faculty/admin email and complete login
+// @route   POST /api/auth/verify-login-otp
+// @access  Public
+// =============================================================
+exports.verifyLoginOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        if (!email || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and OTP are required.'
+            });
+        }
+
+        const stored = loginOTPStore[email.toLowerCase()];
+
+        if (!stored) {
+            return res.status(400).json({
+                success: false,
+                message: 'No pending verification found. Please login again to get a new code.'
+            });
+        }
+
+        // Check expiry
+        if (Date.now() > stored.expiresAt) {
+            delete loginOTPStore[email.toLowerCase()];
+            return res.status(400).json({
+                success: false,
+                message: 'Verification code has expired. Please login again to get a new code.'
+            });
+        }
+
+        // Compare OTP
+        if (stored.otp !== otp.trim()) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid verification code. Please try again.'
+            });
+        }
+
+        // OTP is valid — clear it from store (single-use)
+        delete loginOTPStore[email.toLowerCase()];
+
+        // Fetch user and generate tokens
+        const user = await User.findById(stored.userId);
+
+        if (!user || !user.isActive) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not found or account is inactive.'
+            });
+        }
+
+        const { accessToken, refreshToken } = generateTokens(user);
+        const userData = user.toPublicJSON();
+
+        console.log(`✅ ${stored.role} logged in successfully via OTP: ${email}`);
+
+        return res.status(200).json({
+            success: true,
+            accessToken,
+            refreshToken,
+            user: userData
+        });
+
+    } catch (error) {
+        console.error('Verify login OTP error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error during OTP verification',
+            error: error.message
+        });
+    }
+};
+
+// =============================================================
+// RESEND LOGIN OTP
+// @desc    Resend OTP to faculty/admin email
+// @route   POST /api/auth/resend-login-otp
+// @access  Public
+// =============================================================
+exports.resendLoginOTP = async (req, res) => {
+    try {
+        const { email, role } = req.body;
+
+        if (!email || !role) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and role are required.'
+            });
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase() });
+
+        if (!user || user.role !== role) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.'
+            });
+        }
+
+        // Generate new OTP
+        const otp = generateOTP();
+        const expiresAt = Date.now() + 10 * 60 * 1000;
+
+        loginOTPStore[user.email] = {
+            otp,
+            expiresAt,
+            userId: user._id.toString(),
+            role: user.role
+        };
+
+        await sendLoginVerificationOTP(user.email, otp, role, user.name);
+
+        console.log(`🔄 OTP resent for ${role} [${user.email}]: ${otp}`);
+
+        return res.status(200).json({
+            success: true,
+            message: `A new verification code has been sent to ${user.email}.`
+        });
+
+    } catch (error) {
+        console.error('Resend OTP error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to resend OTP.',
             error: error.message
         });
     }
@@ -312,7 +519,7 @@ exports.getMe = async (req, res) => {
 
 // @desc    Seed production database
 // @route   GET /api/auth/seed-production
-// @access  Public (Protected by secret key in production ideal, but open for this fix)
+// @access  Public
 exports.seedProductionDatabase = async (req, res) => {
     try {
         console.log('\n🌱 Starting database seeding via API...\n');
@@ -323,11 +530,11 @@ exports.seedProductionDatabase = async (req, res) => {
         await Timetable.deleteMany({});
         await Announcement.deleteMany({});
 
-        // 1. Create Admin
+        // 1. Create Admin — UPDATED CREDENTIALS
         const admin = await User.create({
             name: 'System Admin',
-            email: 'admin.portal@skucet.edu',
-            password: 'AdminPortalLogin2026',
+            email: 'vijayamadduru23@gmail.com',
+            password: 'vijaya@2306',
             role: 'admin',
             isFirstLogin: false
         });
@@ -387,7 +594,7 @@ exports.seedProductionDatabase = async (req, res) => {
         for (const sub of subjectsData) {
             const subject = await Subject.create({
                 ...sub,
-                semester: 6, // 3rd Year 2nd Sem
+                semester: 6,
                 branch: 'CSE',
                 isActive: true
             });
@@ -398,19 +605,13 @@ exports.seedProductionDatabase = async (req, res) => {
             await User.findByIdAndUpdate(sub.faculty, { $push: { subjects: subject._id } });
         }
 
-        // Assign all subjects to the shared faculty portal user as well (logic-wise, though schema is one-to-many)
-        // We can't update Subject.faculty to multiple, but we can update User.subjects
         await User.findByIdAndUpdate(sharedFaculty._id, { $set: { subjects: allSubjectIds } });
-
 
         // 4. Create Students (64 students)
         const students = [];
 
-        // Exact Mapping from Register Images
         const studentData = [
             { roll: '2310101', name: 'A. Lochan Kumar' },
-            // 102 skipped
-            // 103 skipped
             { roll: '2310104', name: 'B. Mahesh Babu' },
             { roll: '2310105', name: 'B. Sharada' },
             { roll: '2310106', name: 'B. Ashwini' },
@@ -425,7 +626,6 @@ exports.seedProductionDatabase = async (req, res) => {
             { roll: '2310115', name: 'G. Chandra Sekhar Yadav' },
             { roll: '2310116', name: 'G. Jayanthi' },
             { roll: '2310117', name: 'J. Mythri' },
-            // 118 skipped
             { roll: '2310119', name: 'K. Jyothi' },
             { roll: '2310120', name: 'K. Pavanitha' },
             { roll: '2310121', name: 'K. Bharath Kumar Reddy' },
@@ -485,7 +685,7 @@ exports.seedProductionDatabase = async (req, res) => {
                 role: 'student',
                 rollNumber: data.roll,
                 branch: 'CSE',
-                semester: 6, // 3rd Year 2nd Sem
+                semester: 6,
                 isFirstLogin: false,
                 subjects: allSubjectIds
             });
@@ -494,31 +694,23 @@ exports.seedProductionDatabase = async (req, res) => {
         await User.create(students);
 
         // 5. Create Timetable
-        // Based on analysis of screenshot
-        // Periods: 9-10, 10-11, 11:15-12:15, 12:15-1:15(Lunch), 1:15-2:15, 2:15-3:15, 3:15-4:15
         const timetableSlots = [];
 
         const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-        // Define Schedule Mapping (Day -> [Period 1 Code, Period 2 Code, Period 3 Code, Period 4 Code, Period 5 Code, Period 6 Code])
-        // Assuming 6 periods per day + lunch break
-        // Standard periods: 1, 2, 3, (Lunch), 4, 5, 6
 
         const schedule = {
             'Thursday': ['C&NS', 'CC', 'EI', 'BDA', 'STM', 'LIB'],
             'Friday': ['EI', 'ML', 'BDA', 'SOC', 'SOC', 'SOC'],
             'Saturday': ['CC', 'EI', 'BDA', 'C&NS', 'TPR', 'TPR'],
-            // Fill others with random logic or just repeat
-            'Monday': ['BDA', 'ML', 'CC', 'STM', 'C&NS', 'EI'], // Assumption
-            'Tuesday': ['ML', 'STM', 'C&NS', 'BDA-LAB', 'BDA-LAB', 'BDA-LAB'], // Assumption
-            'Wednesday': ['CC', 'EI', 'ML', 'STM', 'LIB', 'TPR'] // Assumption
+            'Monday': ['BDA', 'ML', 'CC', 'STM', 'C&NS', 'EI'],
+            'Tuesday': ['ML', 'STM', 'C&NS', 'BDA-LAB', 'BDA-LAB', 'BDA-LAB'],
+            'Wednesday': ['CC', 'EI', 'ML', 'STM', 'LIB', 'TPR']
         };
 
         const periodTimes = [
             { p: 1, s: '09:30 AM', e: '10:30 AM' },
             { p: 2, s: '10:30 AM', e: '11:30 AM' },
             { p: 3, s: '11:30 AM', e: '12:30 PM' },
-            // Period 4 starts after lunch (Assuming lunch is 12:30-1:30)
             { p: 4, s: '01:30 PM', e: '02:30 PM' },
             { p: 5, s: '02:30 PM', e: '03:30 PM' },
             { p: 6, s: '03:30 PM', e: '04:30 PM' }
@@ -529,7 +721,6 @@ exports.seedProductionDatabase = async (req, res) => {
 
             daySubjects.forEach((code, index) => {
                 const subjectId = subjectMap[code];
-                // Find faculty for this subject
                 const subjectObj = subjectsData.find(s => s.code === code);
                 const facultyId = subjectObj ? subjectObj.faculty : sharedFaculty._id;
 
@@ -580,7 +771,7 @@ exports.seedProductionDatabase = async (req, res) => {
             success: true,
             message: 'Database seeded successfully with CORRECT data (64 Students, Named Faculty)!',
             credentials: {
-                admin: 'admin.portal@skucet.edu / AdminPortalLogin2026',
+                admin: 'vijayamadduru23@gmail.com / vijaya@2306',
                 faculty: 'faculty.portal@skucet.edu / FacultyPortalLogin2026',
                 student: '2310126@skucet.edu / 2310126'
             }

@@ -1,63 +1,67 @@
 
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const createAdminUser = async () => {
+const updateAdminCredentials = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/campusone');
         console.log('MongoDB Connected');
 
-        const email = 'admin.portal@skucet.edu'; // More professional email
-        // Also support the seed email just in case
-        const seedEmail = 'sku@admin.edu';
+        // New admin credentials
+        const newEmail = 'vijayamadduru23@gmail.com';
+        const newPassword = 'vijaya@2306';
 
-        const rawPassword = 'AdminPortalLogin2026';
+        // Old admin emails to find and update/replace
+        const oldEmails = ['admin.portal@skucet.edu', 'sku@admin.edu'];
 
-        // 1. Check/Update Professional Admin
-        let admin = await User.findOne({ email });
+        // Remove old admin accounts
+        for (const oldEmail of oldEmails) {
+            const old = await User.findOne({ email: oldEmail });
+            if (old) {
+                await User.deleteOne({ email: oldEmail });
+                console.log(`🗑️  Removed old admin: ${oldEmail}`);
+            }
+        }
+
+        // Check if new email already exists
+        let admin = await User.findOne({ email: newEmail });
 
         if (admin) {
-            admin.password = rawPassword; // Model hook will hash
+            // Update existing
+            admin.password = newPassword; // pre-save hook will hash
             admin.role = 'admin';
             admin.isFirstLogin = false;
+            admin.isActive = true;
+            admin.name = 'System Admin';
             await admin.save();
-            console.log(`✅ Updated Admin: ${email}`);
+            console.log(`✅ Updated Admin: ${newEmail}`);
         } else {
+            // Create new admin
             await User.create({
-                name: 'System Administrator',
-                email,
-                password: rawPassword,
+                name: 'System Admin',
+                email: newEmail,
+                password: newPassword,
                 role: 'admin',
                 isFirstLogin: false,
                 isActive: true
             });
-            console.log(`✅ Created Admin: ${email}`);
+            console.log(`✅ Created Admin: ${newEmail}`);
         }
 
-        // 2. Check/Update Seed Admin (legacy support)
-        let seedAdmin = await User.findOne({ email: seedEmail });
-        if (seedAdmin) {
-            seedAdmin.password = rawPassword;
-            seedAdmin.role = 'admin';
-            seedAdmin.isFirstLogin = false;
-            await seedAdmin.save();
-            console.log(`✅ Updated Legacy Admin: ${seedEmail}`);
-        }
+        console.log(`\n✅ SUCCESS! Admin credentials updated:`);
+        console.log(`   Email: ${newEmail}`);
+        console.log(`   Password: ${newPassword}\n`);
 
-        console.log(`\nSUCCESS! You can login with:`);
-        console.log(`Email: ${email}`);
-        console.log(`Password: ${rawPassword}\n`);
-
-        mongoose.disconnect();
+        await mongoose.disconnect();
+        process.exit(0);
     } catch (error) {
-        console.error(error);
+        console.error('❌ Error:', error);
         process.exit(1);
     }
 };
 
-createAdminUser();
+updateAdminCredentials();
