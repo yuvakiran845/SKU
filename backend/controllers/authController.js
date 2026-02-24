@@ -3,28 +3,7 @@ const { generateTokens, verifyRefreshToken } = require('../middleware/auth');
 const Subject = require('../models/Subject');
 const Timetable = require('../models/Timetable');
 const Announcement = require('../models/Announcement');
-const { sendLoginVerificationOTP } = require('../utils/emailService');
-
-// =====================================================================
-// IN-MEMORY OTP STORE (per email, expires in 10 minutes)
-// Format: { [email]: { otp, expiresAt, userId, role } }
-// =====================================================================
-const loginOTPStore = {};
-
-// Generate a cryptographically random 6-digit OTP
-function generateOTP() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// Clean up expired OTPs periodically (every 5 minutes)
-setInterval(() => {
-    const now = Date.now();
-    for (const email in loginOTPStore) {
-        if (loginOTPStore[email].expiresAt < now) {
-            delete loginOTPStore[email];
-        }
-    }
-}, 5 * 60 * 1000);
+// OTP email verification removed — faculty & admin login directly with email + password
 
 // =============================================================
 // SIMPLE FACULTY REGISTRATION (No OTP — faculty sets own credentials)
@@ -206,54 +185,17 @@ exports.login = async (req, res) => {
             });
         }
 
-        // ✅ STUDENTS → Direct login (no OTP required)
-        if (role === 'student') {
-            const { accessToken, refreshToken } = generateTokens(user);
-            const userData = user.toPublicJSON();
+        // ✅ ALL ROLES (student, faculty, admin) → Direct login — no OTP
+        const { accessToken, refreshToken } = generateTokens(user);
+        const userData = user.toPublicJSON();
 
-            return res.status(200).json({
-                success: true,
-                accessToken,
-                refreshToken,
-                user: userData
-            });
-        }
+        console.log(`✅ ${role} logged in: ${user.email}`);
 
-        // ✅ FACULTY & ADMIN → Require OTP email verification
-        // Generate OTP
-        const otp = generateOTP();
-        const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-        // Store OTP in memory
-        loginOTPStore[user.email] = {
-            otp,
-            expiresAt,
-            userId: user._id.toString(),
-            role: user.role
-        };
-
-        console.log(`🔐 Login OTP generated for ${role} [${user.email}]: ${otp}`);
-
-        // Send OTP via email
-        try {
-            await sendLoginVerificationOTP(user.email, otp, role, user.name);
-        } catch (emailError) {
-            console.error('Email send failed:', emailError.message);
-            // Remove OTP from store if email failed
-            delete loginOTPStore[user.email];
-            return res.status(500).json({
-                success: false,
-                message: 'Failed to send verification email. Please check that the email service is configured correctly and try again.',
-                error: emailError.message
-            });
-        }
-
-        // Respond with OTP-required signal (do NOT send token yet)
         return res.status(200).json({
             success: true,
-            requiresOTP: true,
-            email: user.email,
-            message: `A 6-digit verification code has been sent to ${user.email}. Please check your inbox.`
+            accessToken,
+            refreshToken,
+            user: userData
         });
 
     } catch (error) {
@@ -266,139 +208,10 @@ exports.login = async (req, res) => {
     }
 };
 
-// =============================================================
-// VERIFY LOGIN OTP (Faculty & Admin only)
-// @desc    Verify the OTP sent to faculty/admin email and complete login
-// @route   POST /api/auth/verify-login-otp
-// @access  Public
-// =============================================================
-exports.verifyLoginOTP = async (req, res) => {
-    try {
-        const { email, otp } = req.body;
-
-        if (!email || !otp) {
-            return res.status(400).json({
-                success: false,
-                message: 'Email and OTP are required.'
-            });
-        }
-
-        const stored = loginOTPStore[email.toLowerCase()];
-
-        if (!stored) {
-            return res.status(400).json({
-                success: false,
-                message: 'No pending verification found. Please login again to get a new code.'
-            });
-        }
-
-        // Check expiry
-        if (Date.now() > stored.expiresAt) {
-            delete loginOTPStore[email.toLowerCase()];
-            return res.status(400).json({
-                success: false,
-                message: 'Verification code has expired. Please login again to get a new code.'
-            });
-        }
-
-        // Compare OTP
-        if (stored.otp !== otp.trim()) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid verification code. Please try again.'
-            });
-        }
-
-        // OTP is valid — clear it from store (single-use)
-        delete loginOTPStore[email.toLowerCase()];
-
-        // Fetch user and generate tokens
-        const user = await User.findById(stored.userId);
-
-        if (!user || !user.isActive) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not found or account is inactive.'
-            });
-        }
-
-        const { accessToken, refreshToken } = generateTokens(user);
-        const userData = user.toPublicJSON();
-
-        console.log(`✅ ${stored.role} logged in successfully via OTP: ${email}`);
-
-        return res.status(200).json({
-            success: true,
-            accessToken,
-            refreshToken,
-            user: userData
-        });
-
-    } catch (error) {
-        console.error('Verify login OTP error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Server error during OTP verification',
-            error: error.message
-        });
-    }
-};
-
-// =============================================================
-// RESEND LOGIN OTP
-// @desc    Resend OTP to faculty/admin email
-// @route   POST /api/auth/resend-login-otp
-// @access  Public
-// =============================================================
-exports.resendLoginOTP = async (req, res) => {
-    try {
-        const { email, role } = req.body;
-
-        if (!email || !role) {
-            return res.status(400).json({
-                success: false,
-                message: 'Email and role are required.'
-            });
-        }
-
-        const user = await User.findOne({ email: email.toLowerCase() });
-
-        if (!user || user.role !== role) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found.'
-            });
-        }
-
-        // Generate new OTP
-        const otp = generateOTP();
-        const expiresAt = Date.now() + 10 * 60 * 1000;
-
-        loginOTPStore[user.email] = {
-            otp,
-            expiresAt,
-            userId: user._id.toString(),
-            role: user.role
-        };
-
-        await sendLoginVerificationOTP(user.email, otp, role, user.name);
-
-        console.log(`🔄 OTP resent for ${role} [${user.email}]: ${otp}`);
-
-        return res.status(200).json({
-            success: true,
-            message: `A new verification code has been sent to ${user.email}.`
-        });
-
-    } catch (error) {
-        console.error('Resend OTP error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to resend OTP.',
-            error: error.message
-        });
-    }
-};
+// OTP verification routes removed — faculty & admin now login directly without email OTP.
+// Keeping stubs so any lingering route references return a helpful message instead of crashing.
+exports.verifyLoginOTP = (req, res) => res.status(410).json({ success: false, message: 'OTP verification is no longer required. Please login directly.' });
+exports.resendLoginOTP = (req, res) => res.status(410).json({ success: false, message: 'OTP verification is no longer required. Please login directly.' });
 
 // @desc    Refresh access token
 // @route   POST /api/auth/refresh
@@ -530,11 +343,11 @@ exports.seedProductionDatabase = async (req, res) => {
         await Timetable.deleteMany({});
         await Announcement.deleteMany({});
 
-        // 1. Create Admin — UPDATED CREDENTIALS
+        // 1. Create Admin — PORTAL CREDENTIALS
         const admin = await User.create({
             name: 'System Admin',
-            email: 'vijayamadduru23@gmail.com',
-            password: 'vijaya@2306',
+            email: 'admin.portal@skucet.edu',
+            password: 'AdminPortalLogin2026',
             role: 'admin',
             isFirstLogin: false
         });
@@ -771,7 +584,7 @@ exports.seedProductionDatabase = async (req, res) => {
             success: true,
             message: 'Database seeded successfully with CORRECT data (64 Students, Named Faculty)!',
             credentials: {
-                admin: 'vijayamadduru23@gmail.com / vijaya@2306',
+                admin: 'admin.portal@skucet.edu / AdminPortalLogin2026',
                 faculty: 'faculty.portal@skucet.edu / FacultyPortalLogin2026',
                 student: '2310126@skucet.edu / 2310126'
             }
