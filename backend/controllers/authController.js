@@ -462,7 +462,7 @@ exports.seedProductionDatabase = async (req, res) => {
             { roll: '2310139', name: 'P. Aparna' },
             { roll: '2310140', name: 'P. Sravani' },
             { roll: '2310141', name: 'P. Susmitha Das' },
-            { roll: '2310142', name: 'P. Bharya Sree' },
+            { roll: '2310142', name: 'P. Bhavya Sree' },
             { roll: '2310143', name: 'R. Chetana' },
             { roll: '2310144', name: 'S. Abhiram' },
             { roll: '2310145', name: 'S. Divya Sree' },
