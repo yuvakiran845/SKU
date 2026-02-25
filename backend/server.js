@@ -12,16 +12,14 @@ const adminRoutes = require('./routes/adminRoutes');
 // Initialize express app
 const app = express();
 
-// Connect to database
-// Connect to database
+// ── Database connection ───────────────────────────────────────────────────────
 connectDB().then(() => {
-    // Run migrations
     require('./migrations/cleanupTimetable')();
 });
 
-// Middleware
+// ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
-    origin: true, // Allow any origin for development
+    origin: true,
     credentials: true
 }));
 app.use(express.json());
@@ -33,7 +31,22 @@ app.use((req, res, next) => {
     next();
 });
 
-// API Routes
+// ── Health / Ping endpoint (used by UptimeRobot + self-ping) ─────────────────
+// Responds instantly with 200 — no DB call, so Render never has to cold-start
+// before answering this request.
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+        message: 'SKUCET Backend is alive 🟢'
+    });
+});
+
+// Alias — some monitors use /ping
+app.get('/ping', (req, res) => res.status(200).send('pong'));
+
+// ── API Routes ────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/faculty', facultyRoutes);
@@ -49,23 +62,20 @@ app.get('/', (req, res) => {
             auth: '/api/auth',
             student: '/api/student',
             faculty: '/api/faculty',
-            admin: '/api/admin'
+            admin: '/api/admin',
+            health: '/health'
         }
     });
 });
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Route not found'
-    });
+    res.status(404).json({ success: false, message: 'Route not found' });
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-
     res.status(err.status || 500).json({
         success: false,
         message: err.message || 'Internal server error',
@@ -73,7 +83,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
+// ── Start server ──────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5001;
 
 const server = app.listen(PORT, '0.0.0.0', () => {
@@ -86,9 +96,43 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log('='.repeat(60) + '\n');
     console.log('✅ Ready to accept requests!\n');
+
+    // ── Self-keep-alive ping ──────────────────────────────────────────────────
+    // Render's free tier spins the server down after 15 min of inactivity.
+    // This pings our own /health endpoint every 4 minutes so the server NEVER
+    // sleeps, making every login (including the very first) respond in < 2 sec.
+    //
+    // Only runs in production (on Render) where RENDER_EXTERNAL_URL is set.
+    // Does NOT run locally to avoid unnecessary noise.
+    const selfPingUrl = process.env.RENDER_EXTERNAL_URL
+        ? `${process.env.RENDER_EXTERNAL_URL}/health`
+        : null;
+
+    if (selfPingUrl) {
+        console.log(`🏓 Self-keep-alive enabled → pinging ${selfPingUrl} every 4 min\n`);
+
+        // Use Node's built-in https/http — no extra dependency needed
+        const httpModule = selfPingUrl.startsWith('https') ? require('https') : require('http');
+
+        const selfPing = () => {
+            httpModule.get(selfPingUrl, (res) => {
+                console.log(`🟢 Self-ping OK [${new Date().toISOString()}] status=${res.statusCode}`);
+            }).on('error', (err) => {
+                console.warn(`🟡 Self-ping failed (non-fatal): ${err.message}`);
+            });
+        };
+
+        // First ping 30 seconds after startup so the server is fully ready
+        setTimeout(selfPing, 30_000);
+
+        // Then every 4 minutes (240 000 ms) — well under Render's 15-min idle timeout
+        setInterval(selfPing, 4 * 60 * 1000);
+    } else {
+        console.log('ℹ️  Self-keep-alive skipped (local dev environment)\n');
+    }
 });
 
-// Handle server errors
+// ── Server error handling ─────────────────────────────────────────────────────
 server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
         console.error('\n' + '!'.repeat(60));
@@ -101,18 +145,14 @@ server.on('error', (error) => {
     }
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.error('❌ Unhandled Promise Rejection:', err);
     server.close(() => process.exit(1));
 });
 
-// Handle SIGTERM
 process.on('SIGTERM', () => {
     console.log('👋 SIGTERM received. Shutting down gracefully...');
-    server.close(() => {
-        console.log('✅ Process terminated!');
-    });
+    server.close(() => console.log('✅ Process terminated!'));
 });
 
 module.exports = app;
