@@ -212,12 +212,22 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-layout">
-            {/* Hamburger */}
-            <button className="mobile-toggle-btn" onClick={() => setIsSidebarOpen(true)} aria-label="Open menu">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                    <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
-                </svg>
-            </button>
+
+            {/* ── Mobile topbar (logo + hamburger) — only visible on mobile ── */}
+            <div className="mobile-topbar">
+                <div className="mobile-topbar-brand">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="url(#mtbg)" />
+                        <defs><linearGradient id="mtbg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#0EA5E9" /><stop offset="100%" stopColor="#10B981" /></linearGradient></defs>
+                    </svg>
+                    <span className="mobile-topbar-title">Admin Portal</span>
+                </div>
+                <button className="mobile-toggle-btn" onClick={() => setIsSidebarOpen(true)} aria-label="Open menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
 
             {/* Overlay */}
             {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}

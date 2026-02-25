@@ -911,29 +911,28 @@ body {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* ── Hamburger toggle (always in DOM, hidden on desktop) ── */
-.mobile-toggle-btn {
+/* ── Mobile topbar: hidden on desktop, full-width bar on mobile ── */
+.mobile-topbar {
     display: none;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 1002;
-    background: white;
-    border: 1px solid #e3e8ee;
-    padding: 8px 10px;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, .10);
-    cursor: pointer;
-    color: var(--stripe-text);
+}
+
+/* The hamburger button lives inside .mobile-topbar on mobile */
+.mobile-toggle-btn {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0;
-    line-height: 0;
-    transition: box-shadow 0.18s;
+    background: transparent;
+    border: 1px solid #e3e8ee;
+    padding: 7px 9px;
+    border-radius: 9px;
+    cursor: pointer;
+    color: var(--stripe-text);
+    transition: background 0.18s, border-color 0.18s;
+    flex-shrink: 0;
 }
 
 .mobile-toggle-btn:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, .16);
+    background: #f6f9fc;
     border-color: #c4ccd8;
 }
 
@@ -968,9 +967,39 @@ body {
 
 /* ── Responsive: Mobile ── */
 @media (max-width: 768px) {
-    .mobile-toggle-btn {
+
+    /* Stack topbar above main content vertically */
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    /* Switch from floating hamburger to a proper sticky topbar */
+    .mobile-topbar {
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: white;
+        border-bottom: 1px solid #e3e8ee;
+        position: sticky;
+        top: 0;
+        z-index: 1001;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .07);
+        /* Topbar spans full width, including any sidebar space */
+        width: 100%;
+    }
+
+    .mobile-topbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mobile-topbar-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--stripe-text);
+        letter-spacing: -0.4px;
     }
 
     .sidebar {
@@ -1023,8 +1052,8 @@ body {
     }
 
     .main-content {
-        /* Extra top padding clears the fixed hamburger button (12px top + ~40px height + 12px gap) */
-        padding: 5rem 1rem 1.5rem;
+        /* No large top padding needed — the sticky topbar sits above in flow */
+        padding: 1.25rem 1rem 1.5rem;
     }
 
     .page-title h1 {
