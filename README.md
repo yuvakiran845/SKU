@@ -92,4 +92,4 @@ Optimized for:
 
 Proprietary – SK University CSE Department
 
-Built with ❤️ for modern academic workflow management.
+Built with ❤️ for modern academic workflow management...
